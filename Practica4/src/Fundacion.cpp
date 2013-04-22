@@ -12,6 +12,7 @@ Fundacion::Fundacion(string nombre, float saldo)
 {
 	SetNombreFundacion(nombre);
 	SetSaldo(saldo);
+	presidente = "Sin presidente...";
 }
 
 //getters y setters
@@ -43,8 +44,15 @@ string Fundacion::GetNombrePresidente()
 bool Fundacion::SetNombrePresidente(string dni)
 {
 	bool es_miembro = false;
+	int posicion;
 
-	this->presidente = dni;
+	posicion = BuscarMiembro(dni);
+
+	if (posicion != -1)
+	{
+		this->presidente = dni;
+		es_miembro = true;
+	}
 
 	return es_miembro;
 }
@@ -84,7 +92,7 @@ bool Fundacion::AgregarMiembro(Persona &p)
 
 	if (posicion == -1)
 	{
-		miembros.insert(miembros.begin(), p);
+		miembros.push_back(p);
 		ok = true;
 	}
 
@@ -159,4 +167,39 @@ bool Fundacion::operator-(string dni)
 	ok = DesligarMiembro(dni);
 
 	return ok;
+}
+
+ostream& operator<< (ostream &out, Fundacion &f)
+{
+	int indice = f.BuscarMiembro(f.presidente);
+
+	out << "----------------------------------------------" << endl;
+	out << "            DATOS DE LA FUNDACION             " << endl;
+	out << "----------------------------------------------" << endl;
+
+
+	if (indice != -1)
+	{
+		Persona p = f.miembros[indice];
+
+		out << endl << "Nombre: " << f.nombre << endl << "Presidente: " << p.GetNombre() << " " << p.GetApellido1() << " " << p.GetApellido2() << endl << "saldo: " << f.saldo << " €" << endl;
+	}
+	else
+	{
+		out << endl << "Nombre: " << f.nombre << endl << "Presidente: " << f.presidente << endl << "saldo: " << f.saldo << " €" << endl;
+	}
+}
+
+void Fundacion::ImprimirLista()
+{
+	cout << "--------------------------------------------" << endl;
+	cout << "              LISTA MIEMBROS                " << endl;
+	cout << "--------------------------------------------" << endl;
+
+	//Recorremos con un for la lista de miembros y imprimimos sus datos.
+	for (unsigned int i = 0; i < miembros.size(); i++)
+	{
+		cout << endl << "Miembro: " << i << endl;
+		cout << miembros[i] << endl;
+	}
 }

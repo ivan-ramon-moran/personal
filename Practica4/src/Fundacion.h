@@ -31,6 +31,7 @@ public:
 	bool AgregarMiembro(Persona &p);
 	bool DesligarMiembro(string dni);
 	int BuscarMiembro(string dni);
+	void ImprimirLista();
 
 	//Sobrecarga de operadores (Metodos miembro)
 	//Sacar e ingresar dinero con operadores aritmeticos
@@ -40,6 +41,9 @@ public:
 	//Añadir y borrar miembros con operadores aritmeticos
 	bool operator+(Persona &p);
 	bool operator-(string dni);
+
+	//Mostrar los datos de una fundacion
+	friend ostream& operator<<(ostream &out, Fundacion &f);
 private:
 	string nombre, presidente;
 	float saldo;
