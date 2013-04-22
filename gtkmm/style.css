@@ -1,0 +1,8 @@
+#m_button {
+	background-color: red;
+	border-radius: 30px;
+} 
+
+GtkWindow {
+background-color:blue;
+}
