@@ -16,7 +16,7 @@ int main()
 {
 	EmpleadoPorComision *emBasePtr;
 	EmpleadoBaseMasComision emDerivado("Pedro", "J.Santos","1111",10000, 0.06,300);
-	
+	//PENES EVERYWHERE!!!
 	
 	emBasePtr = &emDerivado;
 	emBasePtr->imprimir();
