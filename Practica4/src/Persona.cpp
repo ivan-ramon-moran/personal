@@ -14,6 +14,7 @@ Persona::Persona(){}
 //Contructor explicito
 Persona::Persona(string dni, string nombre, string apellido1, string apellido2)
 {
+	//Asignamos DNI, nombre y apellidos a la persona que estamos creando mediante setters.
 	SetDNI(dni);
 	SetNombre(nombre);
 	SetApellido1(apellido1);
@@ -63,6 +64,8 @@ void Persona::SetApellido2(string apellido2)
 
 ostream& operator<<(ostream &out, const Persona &p)
 {
+	/*Sobrecarga del operador de flujo << que nos permite imprimir los datos de una persona de la
+	forma cout << persona;*/
 	out << "Nombre: " << p.nombre << "\n" << "Primer apellido: " << p.apellido1 << "\n"
 		<< "Segundo apellido: " << p.apellido2 << "\n"
 		<< "DNI: " << p.dni;

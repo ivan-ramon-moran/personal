@@ -1,11 +1,4 @@
-//============================================================================
-// Name        : Practica4.cpp
-// Author      : 
-// Version     :
-// Copyright   : Your copyright notice
-// Description : Hello World in C++, Ansi-style
-//============================================================================
-
+//includes
 #include <iostream>
 #include "Persona.h"
 #include "Fundacion.h"
@@ -24,8 +17,10 @@ bool AgregarMiembro(Fundacion &f);
 
 int main()
 {
+	//Creamos una fundacion con nombre "Voos" y saldo 0.
 	Fundacion f("Voos", 0);
 
+	//Iniciamos el programa mostrando el menu de opciones que tiene el usuario.
 	Menu(f);
 
 	return 0;
@@ -35,7 +30,7 @@ int MostrarMenu()
 {
 	int opcion;
 
-
+	//Mostramos el menu
 	cout << "\n" << "[1].Cambiar nombre." << "\n" << "[2].Ingresar dinero." << "\n"
 		<< "[3].Retirar dinero." << "\n" << "[4].Cambiar presidente." << "\n" << "[5].Agregar miembro." << "\n"
 		<< "[6].Desligar miembro" << "\n" << "[7].Salir" << endl;
@@ -52,9 +47,9 @@ void Menu(Fundacion &f)
 	float cantidad;
 	bool operacion_realizada;
 
-
 	while (opcion != SALIDA_PROGRAMA)
 	{
+		//Imprimimos el menu y pedimos al usuario una opcion.
 		opcion = MostrarMenu();
 
 		switch(opcion)
@@ -128,8 +123,8 @@ void Menu(Fundacion &f)
 				break;
 			case 5:
 				//El case 5 corresponde a la opcion de agregar un nuevo miembro
-				//Llamamos a la funcion AgregarMiembro(f) que lo que hace es leer una persona
-				//y añadirla en la lista de miembros, tambien guardamos el resultado de la operacion.
+				/*Llamamos a la funcion AgregarMiembro(f) que lo que hace es leer una persona
+				y añadirla en la lista de miembros, tambien guardamos el resultado de la operacion.*/
 				operacion_realizada = AgregarMiembro(f);
 
 				//Dependiendo del resultado de la operacion mostramos un mensaje
@@ -170,6 +165,7 @@ bool AgregarMiembro(Fundacion &f)
 	string nombre, apellido1, apellido2, dni;
 	bool res_ope;
 
+	//Leemos los atributos y cremos una nueva persona.
 	cout << "Introduce el DNI: ";
 	cin >> dni;
 
@@ -183,6 +179,7 @@ bool AgregarMiembro(Fundacion &f)
 	cin >> apellido2;
 
 	Persona p(dni, nombre, apellido1, apellido2);
+	//Añadimos la persona a la lista de miembros.
 	res_ope = f + p;
 
 	return res_ope;

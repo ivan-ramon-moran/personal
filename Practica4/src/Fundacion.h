@@ -26,11 +26,17 @@ public:
 	bool SetNombrePresidente(string dni);
 
 	//Operaciones permitidas
+	//Funcion que permite ingresar dinero.
 	bool IngresarDinero(float cantidad);
+	//Funcion que permite retirar dinero
 	bool RetirarDinero(float cantidad);
+	//Funcion que permite agregar un miembro
 	bool AgregarMiembro(Persona &p);
+	//Funcion que permite eliminar un miebro
 	bool DesligarMiembro(string dni);
+	//Funcion que permite buscar a un miembro por su DNI.
 	int BuscarMiembro(string dni);
+	//Imprime una lista con los miembros de la fundacion.
 	void ImprimirLista();
 
 	//Sobrecarga de operadores (Metodos miembro)

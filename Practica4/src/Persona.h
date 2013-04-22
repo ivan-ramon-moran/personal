@@ -26,6 +26,8 @@ public:
 	void SetNombre(string nombre);
 
 	//Sobrecarga de operadores
+	/*Sobrecarga del operador de flujo << que nos permite imprimir los datos de una persona de la
+	forma cout << persona;*/
 	friend ostream& operator<<(ostream &out, const Persona &p);
 private:
 	string dni, nombre, apellido1, apellido2;
