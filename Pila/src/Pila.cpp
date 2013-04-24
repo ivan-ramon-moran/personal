@@ -9,6 +9,7 @@
 #define PILA_H_
 
 #include <iostream>
+#include <vector>
 
 using namespace std;
 
@@ -97,6 +98,61 @@ public:
 	int GetNumeroElementos()
 	{
 		return this->num_elementos;
+	}
+
+	void ConcatenarPila(const Pila &p)
+	{
+		Nodo * cimap1_aux = cima;
+		Nodo * cimap2_aux = p.cima;
+
+		//Situamos la cima auxilar en el ultimo ultimo/primer (depende de como se mire) de la pila
+		while (cimap1_aux->sig != NULL)
+		{
+			cimap1_aux = cimap1_aux->sig;
+		}
+
+		//Recorremos la pila 2 y vamos concatenando los nodos de la pila2 a la pila 1
+		while (cimap2_aux != NULL)
+		{
+			//Concateno el nodo
+			cimap1_aux->sig = cimap2_aux;
+
+			//Avanzo al siguiente nodo en las 2 pilas
+			cimap2_aux = cimap2_aux->sig;
+			cimap1_aux = cimap1_aux->sig;
+		}
+	}
+
+	void ImprimirPila()
+	{
+		Nodo *cima_aux = cima;
+
+		while (cima_aux != NULL)
+		{
+			cout << cima_aux->objeto;
+			cima_aux = cima_aux->sig;
+		}
+	}
+
+	void InvertirPila()
+	{
+		vector<Tipo> v;
+		Nodo *cima_aux = cima;
+
+		while (cima_aux != NULL)
+		{
+			//Metemos el elemento en el vector
+			v.push_back(cima_aux->objeto);
+			cima_aux = cima_aux->sig;
+		}
+
+		cima_aux = cima;
+
+		for (int i = v.size() - 1; i >= 0; i--)
+		{
+			cima_aux->objeto = v[i];
+			cima_aux = cima_aux->sig;
+		}
 	}
 
 private:
