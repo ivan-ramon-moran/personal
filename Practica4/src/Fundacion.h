@@ -17,13 +17,13 @@ public:
 	Fundacion(string nombre, float saldo);
 
 	//getters y setters
-	string GetNombrePresidente();
-	string GetNombreFundacion();
-	float  GetSaldo();
+	string GetDNIPresidente() const;
+	string GetNombreFundacion() const;
+	float  GetSaldo() const;
 
 	void  SetSaldo(float saldo);
 	void SetNombreFundacion(string nombre);
-	bool SetNombrePresidente(string dni);
+	bool SetDNIPresidente(string dni);
 
 	//Operaciones permitidas
 	//Funcion que permite ingresar dinero.
@@ -31,7 +31,7 @@ public:
 	//Funcion que permite retirar dinero
 	bool RetirarDinero(float cantidad);
 	//Funcion que permite agregar un miembro
-	bool AgregarMiembro(Persona &p);
+	bool AgregarMiembro(const Persona &p);
 	//Funcion que permite eliminar un miebro
 	bool DesligarMiembro(string dni);
 	//Funcion que permite buscar a un miembro por su DNI.

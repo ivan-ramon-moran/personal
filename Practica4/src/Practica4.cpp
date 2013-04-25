@@ -1,3 +1,8 @@
+//===========================================================================//
+// Nombre        : Practica4.cpp                                             //
+// Autores     : Iván Ramón Morán y Jorge Salguero Domínguez                 //
+//===========================================================================//
+
 //includes
 #include <iostream>
 #include "Persona.h"
@@ -11,9 +16,9 @@ const string OPE_OK = "[OK] La operacion se ha realizado correctamente.";
 const string OPE_FAIL = "[ERROR] No se ha podido realizar la operacion.";
 
 //Prototipos
-int MostrarMenu();
-void Menu(Fundacion &f);
-bool AgregarMiembro(Fundacion &f);
+int MostrarMenu();                  //Funci�n que muestre el menu
+void Menu(Fundacion &f);            //Funci�n que realiza las opciones del menu
+bool AgregarMiembro(Fundacion &f);  //Funci�n para agragar una persona a una fundacion
 
 int main()
 {
@@ -26,19 +31,45 @@ int main()
 	return 0;
 }
 
+/********************************** MostrarMenu **************************************
+ *                                                                                   *
+ *  Descripcion:  Muestra por pantalla las opciones del menu..                       *
+ *  Parametros:                                                                      *
+ *  Nombre          Tipo        E/S  Descripcion                                     *
+ *  ------          ----------  ---  ------------                                    *
+ *                                                                                   *
+ *  Valor devuelto: int opcion                                                       *
+ *************************************************************************************/
+
 int MostrarMenu()
 {
 	int opcion;
 
 	//Mostramos el menu
-	cout << "\n" << "[1].Cambiar nombre." << "\n" << "[2].Ingresar dinero." << "\n"
-		<< "[3].Retirar dinero." << "\n" << "[4].Cambiar presidente." << "\n" << "[5].Agregar miembro." << "\n"
-		<< "[6].Desligar miembro" << "\n" << "[7].Salir" << endl;
+	cout << "[1] Cambiar nombre." << endl;
+	cout << "[2] Ingresar dinero." << endl;
+	cout << "[3] Retirar dinero." << endl;
+	cout << "[4] Cambiar presidente." << endl;
+	cout << "[5] Agregar miembro." << endl;
+	cout << "[6] Desligar miembro" << endl;
+	cout << "[7] Salir" << endl;
+
 	cout << "Introduce una opcion:" ;
 	cin >> opcion;
 
 	return opcion;
 }
+
+/********************************** Menu **************************************
+ *                                                                            *
+ *  Descripcion:  Muestra por pantalla las opciones del menu..                *
+ *  Parametros:                                                               *
+ *  Nombre          Tipo        E/S  Descripcion                              *
+ *  ------          ----------  ---  ------------                             *
+ *  f               Fundacion   E/S  Fundacion con la que se va a trabajar.   *
+ *                                                                            *
+ *  Valor devuelto: void                                                      *
+ *****************************************************************************/
 
 void Menu(Fundacion &f)
 {
@@ -63,8 +94,10 @@ void Menu(Fundacion &f)
 				f.SetNombreFundacion(nombre_f);
 				//Imprimimos un mensaje indicado el resultado de la operacion
 				cout << OPE_OK << endl;
+
 				//Mostramos los datos de la fundacion.
 				cout << f << endl;
+
 				break;
 			case 2:
 				//El case 2 corresponde a la opcion de ingresar dinero en la fundacion
@@ -83,6 +116,7 @@ void Menu(Fundacion &f)
 
 				//Imprimimos los nuevos datos de la fundacion.
 				cout << f << endl;
+
 				break;
 			case 3:
 				//El case 3 corresponde a la opcion de retirar dinero de la fundacion.
@@ -91,7 +125,7 @@ void Menu(Fundacion &f)
 				cin >> cantidad;
 
 				//Retiramos el dinero y obtenemos el resultado de la operacion.
-				operacion_realizada = f.RetirarDinero(cantidad);
+				operacion_realizada = f - cantidad;
 
 				//Dependiendo del resultado de la operacion, mostramos un mensaje.
 				if (operacion_realizada)
@@ -101,6 +135,7 @@ void Menu(Fundacion &f)
 
 				//Mostramos los datos actualizados de la fundacion.
 				cout << f << endl;
+
 				break;
 			case 4:
 				//El case 4 se corresponde a la opcion de cambiar de presidente por el dni
@@ -109,7 +144,7 @@ void Menu(Fundacion &f)
 				cin >> dni;
 
 				//Realizamos la operacion y guardamos el resultado
-				operacion_realizada = f.SetNombrePresidente(dni);
+				operacion_realizada = f.SetDNIPresidente(dni);
 
 				//Dependiendo del resultado mostramos un mensaje.
 				if (operacion_realizada)
@@ -118,7 +153,7 @@ void Menu(Fundacion &f)
 					cout << OPE_FAIL << endl;
 
 				//Mostramos los datos actualizados de la fundacion.
-				cout << f;
+				cout << f << endl;
 
 				break;
 			case 5:
@@ -138,8 +173,8 @@ void Menu(Fundacion &f)
 
 				break;
 			case 6:
-				//El case 6 se corresponde a la pocion de borrar un miembro de la lista
-				//Leemos y alamcenamos el DNI
+				//El case 6 se corresponde a la opcion de borrar un miembro de la lista
+				//Leemos y almacenamos el DNI
 				cout << "Introduce el DNI de la persona: ";
 				cin >> dni;
 
@@ -160,6 +195,17 @@ void Menu(Fundacion &f)
 	}
 }
 
+/********************************** AgregarMiembro **************************************
+ *                                                                                      *
+ *  Descripcion:  Pide los datos de la persona que se desea agregar a la fundacion.     *
+ *  Parametros:                                                                         *
+ *  Nombre          Tipo        E/S  Descripcion                                        *
+ *  ------          ----------  ---  ------------                                       *
+ *  f               Fundacion   E/S  Fundacion con la que se va a trabajar.             *
+ *                                                                                      *
+ *  Valor devuelto: bool res_ope                                                        *
+ ***************************************************************************************/
+
 bool AgregarMiembro(Fundacion &f)
 {
 	string nombre, apellido1, apellido2, dni;
@@ -178,7 +224,10 @@ bool AgregarMiembro(Fundacion &f)
 	cout << "Introduce el segundo apellido ";
 	cin >> apellido2;
 
+    /*Declaramos una nueva persona p e invocamos a la funcion
+    la sobrecarga del operador + para añadirla*/
 	Persona p(dni, nombre, apellido1, apellido2);
+
 	//Añadimos la persona a la lista de miembros.
 	res_ope = f + p;
 
