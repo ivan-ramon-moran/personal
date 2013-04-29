@@ -65,7 +65,7 @@ int Directorio::RenombrarFileDir(string path_origen, string path_destino)
 	return res_operacion;
 }
 
-void Directorio::ListarDirectorio(string path)
+void Directorio::ListarDirectorio(string path, vector<string> &vector)
 {
 	//Puntero de tipo DIR
 	DIR *directorioPtr;
@@ -75,10 +75,13 @@ void Directorio::ListarDirectorio(string path)
 	//Abrimos el directorio
 	directorioPtr = opendir(path.c_str());
 
-	//Mientras haya directorio a listar, los vamos rellenando en el struct.
-	while ((direntPtr = readdir(directorioPtr)) != NULL)
+	if (directorioPtr)
 	{
-		//Mostramos el directorio
-		cout << direntPtr->d_name << endl;
+		//Mientras haya directorio a listar, los vamos rellenando en el struct.
+		while ((direntPtr = readdir(directorioPtr)) != NULL)
+		{
+			//Añadimos el directorio al vector
+			vector.push_back(direntPtr->d_name);
+		}
 	}
 }

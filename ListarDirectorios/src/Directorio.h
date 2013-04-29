@@ -7,6 +7,7 @@
 #include <dirent.h>
 #include <errno.h>
 #include <string.h>
+#include <vector>
 
 using namespace std;
 
@@ -18,7 +19,7 @@ public:
 	static int BorrarFileDir(string path);
 	static int CrearDirectorio(string path);
 	static int RenombrarFileDir(string path_origen, string path_destino);
-	static void ListarDirectorio(string path);
+	static void ListarDirectorio(string path, vector<string> &vector);
 
 
 };
