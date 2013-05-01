@@ -10,6 +10,7 @@ int main()
 	string mensaje;
 
 	cliente.Conectar("127.0.0.1", 8888);
+	/*
 	cin >> mensaje;
 
 	while (mensaje != "salir")
@@ -29,6 +30,21 @@ int main()
 		cin >> mensaje;
 	}
 
+
 	//Enviamos el mensaje de salida
 	cliente.EnviarDatos("salir");
+	*/
+	//Recibimos el fichero
+
+	getline(cin, mensaje);
+
+	while (mensaje != "salir")
+	{
+		cliente.EnviarDatos(mensaje);
+		cliente.RecibirFichero();
+		getline(cin, mensaje);
+	}
+
+	//cliente.RecibirFichero();
+
 }

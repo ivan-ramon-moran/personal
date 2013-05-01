@@ -4,10 +4,12 @@
 #include <stdio.h> //printf
 #include <string.h>    //strlen
 #include <sys/socket.h>    //socket
+#include <sys/stat.h>
 #include <arpa/inet.h> //inet_addr
 #include <iostream>
 #include <vector>
 #include <stdlib.h>
+#include <fstream>
 
 using namespace std;
 
@@ -24,9 +26,13 @@ public:
 	void Conectar(string direccion_ip, int puerto);
 	void EnviarDatos(string mensaje);
 	void RecibirDatos(vector<string> &v_resultado);
-	void Sincronizar();
+	void SendReady();
+	void RecibirFichero();
+	void EnviarArchivo(string path);
+	string ObtenerNombreFichero(string path);
+	bool GetReady();
 
-	//Para ordenar
+	//Para meter en una clase utilidades con metodo estatico
 	string Array2String(char cadena[], unsigned int tamanyo);
 private:
 	int sock;
