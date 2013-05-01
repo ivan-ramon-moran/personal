@@ -30,6 +30,10 @@ int main()
 		}
 	}
 
+
+	/*server.Escuchar();
+	server.EnviarArchivo("/home/k3rnel/Escritorio/a.png");*/
+
 	return 0;
 }
 
