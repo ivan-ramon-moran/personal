@@ -20,8 +20,6 @@ public:
 	Server();
 	Server(int port);
 	void Escuchar();
-	void Pene();
-	void Pene2();
 	void EnviarDatos(char []);
 	void EnviarDatos(int numero);
 	void EnviarDatos(vector<string> &vector);
