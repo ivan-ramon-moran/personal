@@ -70,6 +70,7 @@ string Server::RecibirDatos()
 	else
 		resultado = Array2String(client_message, read_size);
 
+	SendReady();
 
 	return resultado;
 }
@@ -78,6 +79,8 @@ void Server::EnviarDatos(char cadena[])
 {
 	if (write(client_sock, cadena, strlen(cadena)) < 0)
 	    cout << "Error en la transferencia";
+
+	GetReady();
 }
 
 void Server::EnviarDatos(vector<string> &vector)
@@ -156,12 +159,13 @@ void Server::EnviarArchivo(string path)
 	char *data = new char[1024];
 	ifstream file;
 	struct stat filestatus;
-	unsigned long long tamanyo_fichero;
+	unsigned long long tamanyo_fichero, tamanyo_restante;
 	string nombre_fichero;
 
 	//tamanyo del fichero
 	stat(path.c_str() , &filestatus );
 	tamanyo_fichero = filestatus.st_size;
+	tamanyo_restante = tamanyo_fichero;
 
 	//Abrimos el fichero
 	file.open(path.c_str(), ios::binary);
@@ -177,11 +181,14 @@ void Server::EnviarArchivo(string path)
 		while (file.read(data, 1024))
 		{
 			write(client_sock, data, 1024);
-			tamanyo_fichero -= 1024;
+			tamanyo_restante -= 1024;
+			//GetReady();
 		}
 
-		write(client_sock, data, tamanyo_fichero);
-
+		cout << tamanyo_restante << endl;
+		write(client_sock, data, tamanyo_restante);
+		//GetReady();
+		cout << "enviado" << endl;
 
 		file.close();
 	}
@@ -198,7 +205,6 @@ void Server::RecibirFichero()
 
 	//Recibimos el nombre del fichero
 	num_bytes = recv(client_sock, c_nombre_fichero, 100, 0);
-	SendReady();
 	nombre_fichero = Array2String(c_nombre_fichero, num_bytes);
 
 	//Creamos la ruta completa donde guardaremos el fichero
@@ -209,13 +215,20 @@ void Server::RecibirFichero()
 
 	if (file)
 	{
-		//Recibimos el archivo
-		while ((num_bytes = recv(client_sock, data, 1024,0)) > 0)
-			file.write(data, num_bytes);
 
-		//El ultimo bloque de datos que falta por que no puede leer 1024 bytes y por lo tanto no entra al while.
 		num_bytes = recv(client_sock, data, 1024,0);
+
+		//Recibimos el archivo
+		while (num_bytes == 1024)
+		{
+			cout << num_bytes << endl;
+			file.write(data, num_bytes);
+			num_bytes = recv(client_sock, data, 1024,0);
+		}
+
 		file.write(data, num_bytes);
+
+		cout << "Recibido" << endl;
 
 		file.close();
 	}
@@ -235,4 +248,9 @@ string Server::ObtenerNombreFichero(string path)
 	nombre = path.substr(posicion + 1, path.length());
 
 	return nombre;
+}
+
+void Server::SetConf(Config &config)
+{
+	this->config = config;
 }

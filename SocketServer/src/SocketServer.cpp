@@ -8,10 +8,31 @@ int main()
 {
 	Server server(8888);
 	vector<string> v_resultados;
-
+	Config config;
 	string mensaje;
+	ifstream f_ent;
+	string ruta_entrada;
+	int t_buffer;
 
-	while (1)
+	f_ent.open("config.cfg");
+
+	if (f_ent)
+	{
+		f_ent >> ruta_entrada;
+		f_ent >> t_buffer;
+
+		//Cerramos el fichero
+		f_ent.close();
+		config.SetRutaEntrada(ruta_entrada);
+		config.SetTamBuffer(t_buffer);
+	}
+	else
+		cout << "No se ha podido leer el archivo de configuracion" << endl;
+
+	server.SetConf(config);
+
+
+	/*while (1)
 	{
 		server.Escuchar();
 
@@ -29,10 +50,23 @@ int main()
 			mensaje = server.RecibirDatos();
 		}
 	}
+	*/
+
+	while (1)
+	{
+		server.Escuchar();
+		mensaje = server.RecibirDatos();
+
+		while (mensaje != "salir" || server.GetEstadoCliente() != "desconectado")
+		{
+			cout << mensaje << endl;
+			server.EnviarArchivo(mensaje);
+			mensaje.clear();
+			mensaje = server.RecibirDatos();
+		}
+	}
 
 
-	/*server.Escuchar();
-	server.EnviarArchivo("/home/k3rnel/Escritorio/a.png");*/
 
 	return 0;
 }

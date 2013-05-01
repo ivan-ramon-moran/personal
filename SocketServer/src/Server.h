@@ -11,6 +11,7 @@
 #include <sstream>
 #include <vector>
 #include <fstream>
+#include "Config.h"
 
 using namespace std;
 
@@ -31,6 +32,7 @@ public:
 	string RecibirDatos();
 	void RecibirFichero();
 	void SendReady();
+	void SetConf(Config &config);
 
 private:
 	int socket_desc, client_sock , c , read_size;
@@ -38,6 +40,7 @@ private:
 	char client_message[2000];
 	string estado_cliente;
 	string ObtenerNombreFichero(string path);
+	Config config;
 };
 
 #endif /* SERVER_H_ */
