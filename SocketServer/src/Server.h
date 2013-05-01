@@ -23,7 +23,6 @@ public:
 	void EnviarDatos(char []);
 	void EnviarDatos(int numero);
 	void EnviarDatos(vector<string> &vector);
-	void Pene();
 	void EnviarArchivo(string path);
 	bool GetReady();
 	string Array2String(char cadena[], unsigned int tamanyo);
