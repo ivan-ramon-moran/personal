@@ -2,7 +2,6 @@
 
 #include <iostream>
 #include "ColaDinamica.cpp"
-
 using namespace std;
 
 int main()
@@ -20,23 +19,7 @@ int main()
 	cola1.Encolar(cad3);
 	cola1.Encolar(cad4);
 
-	cout << "Elementos: " << cola1.GetNumElementos() << endl;
-
-	while (!cola1.ColaVacia())
-	{
-		cola1.Desencolar(cad_res);
-		cout << "Elementos: " << cola1.GetNumElementos() << endl;
-		cout << cad_res << endl;
-	}
-
-	cola1.Desencolar(cad_res);
-
-	cola1.Encolar(cad1);
-
-	cola1.Desencolar(cad_res);
-
-	cola1.Desencolar(cad_res);
-	cout << cad_res << endl;
+	cola1.MostrarCola();
 
 
 

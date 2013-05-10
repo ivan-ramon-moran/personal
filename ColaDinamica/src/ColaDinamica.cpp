@@ -83,6 +83,17 @@ public:
 	{
 		return this->num_elementos;
 	}
+
+	void MostrarCola()
+	{
+		Nodo *nodo_aux = inicio;
+
+		while (nodo_aux != NULL)
+		{
+			cout << nodo_aux->objeto << " ";
+			nodo_aux = nodo_aux->sig;
+		}
+	}
 private:
 	Nodo *inicio, *fin;
 	int num_elementos;
