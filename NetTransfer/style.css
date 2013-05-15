@@ -1,0 +1,118 @@
+#vent_principal
+{
+	
+}
+#toolbar
+{
+	background:#d9d7d7;	
+}
+
+#datos_conexion
+{
+	background:#d9d7d7;	
+	border-width: 10px;
+}
+
+#toolbar_button
+{
+	background: transparent;
+	border-radius: 5px;
+	border-color:transparent;
+}
+
+#toolbar_button:hover
+{
+	border: 1px #a29ea0;
+	border-style: solid;
+	box-shadow: 0 0 1px 1px #c4c2c3;
+}
+
+#toolbar_button:active
+{
+	box-shadow: 0px 0px 0px #666465;
+	background: #bab7b7;
+}
+
+#scrolled_window
+{
+	background: #FFFFFF;
+	color: #000000;
+	
+}
+
+#entry_conexion
+{
+	border-radius: 15px;
+}
+
+#barra_estado
+{
+	background:#d9d7d7;
+	color: red;
+}
+
+#separador_con
+{
+	background:#d9d7d7;	
+}
+
+#cont_visor
+{
+	background: red;
+
+}
+
+#bot_visor
+{
+	border-radius:0px;
+	background: transparent;
+	padding:4px;
+	border: 0px;
+}
+
+#bot_visor:hover
+{
+	border-radius: 4px;
+	border: 1px #a29ea0;
+	border-style: solid;
+	box-shadow: 0 0 1px 1px #c4c2c3;
+}
+
+#bot_visor:active
+{
+	box-shadow: 0px 0px 0px #666465;
+	background: #bab7b7;
+}
+
+#botonera_visor
+{
+	background: linear-gradient(to bottom, #e7e5e6 20%,#d2ced0 100%);
+	color: #746f72; 
+	font-weight: 500;
+}
+
+#entry_buscar
+{
+	border-radius: 15px;
+	background: transparent;
+}
+
+#entry_buscar:focus
+{
+	background: white;
+		
+}
+
+#final_visor
+{
+	background: linear-gradient(to bottom, #e7e5e6 20%,#d2ced0 100%);
+	color: #746f72; 
+	font-weight: 500;
+}
+
+GtkButton
+ {
+	-GtkWidget-focus-line-width: 0;
+	border-width: 1px;
+	
+}
