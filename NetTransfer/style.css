@@ -48,7 +48,6 @@
 #barra_estado
 {
 	background:#d9d7d7;
-	color: red;
 }
 
 #separador_con
@@ -108,6 +107,11 @@
 	background: linear-gradient(to bottom, #e7e5e6 20%,#d2ced0 100%);
 	color: #746f72; 
 	font-weight: 500;
+}
+
+#ventana_mensaje
+{
+	background: linear-gradient(to bottom, #f6f4f4 20%,#e7e5e6 80%);
 }
 
 GtkButton

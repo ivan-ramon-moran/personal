@@ -12,21 +12,46 @@
 #include <iostream>
 #include <stdio.h>
 #include <string.h>
+#include "FileViewer.h"
+#include "Server.h"
+#include <pthread.h>
+#include "Cliente.h"
+#include <pthread.h>
+#include "Directorio.h"
+#include "Configuracion.h"
+#include "Mensaje.h"
+#include "Archivo.h"
 
 using namespace std;
 
-enum
+struct InfoConexion
 {
-  COL_DISPLAY_NAME,
-  COL_PIXBUF,
-  NUM_COLS
+	GtkWidget *entry_direccion;
+	GtkWidget *entry_puerto;
+	Cliente *cliente;
+	GtkWidget *button_conectar;
+	FileViewer *file_viewer;
+	GtkWidget *label_servidor;
+	GtkWidget *ventana_principal;
+	//0 para conectado y 1 para desconectado
+	int estado;
 };
 
-void Imprimir(GtkWidget *widget, gpointer callback_data);
+struct CompartirConThreads
+{
+	Server *server;
+	GtkWidget *label_servidor;
+	Cliente *cliente;
+};
+
+CompartirConThreads data_threads;
+
+void Imprimir(GtkWidget *widget, gpointer *callback_data);
 void AcercaDe();
-GtkTreeModel *create_and_fill_model ();
-void on_item_activated (GtkTreeView *view, GtkTreePath *path, GtkTreeViewColumn *col, gpointer userdata);
-void on_conectar_clicked(GtkWidget *widget, gpointer c);
+void on_conectar_clicked(GtkWidget *widget, InfoConexion* c);
+void *Escuchar(void *threadid);
+bool ValidarConexion(string direccion, string str_puerto);
+void EliminarArchivosOcultos(vector<Archivo> &v_archivos);
 
 int main (int argc, char *argv[])
 {
@@ -41,8 +66,6 @@ int main (int argc, char *argv[])
 	GtkWidget *toolbar_servidor;
 	GtkWidget *imagen_servidor;
 	GtkWidget *imagen_transferencias;
-	GtkWidget *file_viewer;
-	GtkWidget *scrolled_window;
 	GtkCssProvider *provider;
 	GdkDisplay *display;
 	GdkScreen *screen;
@@ -73,31 +96,17 @@ int main (int argc, char *argv[])
 	GtkWidget *barra_estado;
 	GtkWidget *ev_barra_estado;
 	GtkWidget *separador_con;
-	//Visor de archivos y opciones
-	GtkWidget *cont_cuerpo;
-	GtkWidget *iz_borrar;
-	GtkWidget *cont_visor;
-	GtkWidget *cont_bot_visor;
-	GtkWidget *but_ord_arc;
-	GtkWidget *but_ord_asc;
-	GtkWidget *but_ord_del;
-	GtkWidget *but_sub;
-	GtkWidget *but_desc;
-	GtkWidget *ev_bot_visor;
-	GtkWidget *label_visor;
-	GtkWidget *label_buscar;
-	GtkWidget *entry_buscar;
-	//Final del visor de archivos
-	GtkWidget *ev_final_visor;
-	GtkWidget *label_num_archivos;
-	GtkWidget *cont_final_visor;
-	GdkPixbuf *image_entry_buscar;
-	GError *g = NULL;
 	GtkWidget *toolbar_chat;
 	GtkWidget *imagen_chat;
+	GtkWidget *cont_cuerpo;
+	GtkWidget *iz_borrar;
+	GtkWidget *label_servidor;
+	GtkWidget *img_info_barra_estado;
 
 	gtk_init(&argc, &argv);
 	window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+	InfoConexion *info_conexion = new InfoConexion;
+	info_conexion->ventana_principal = window;
 	gtk_widget_set_name(GTK_WIDGET(window), "vent_principal");
 	gtk_window_set_default_size(GTK_WINDOW(window),1000, 600);
 	gtk_window_set_title(GTK_WINDOW(window), "NetTransfer - Share your files!!!");
@@ -227,11 +236,13 @@ int main (int argc, char *argv[])
 
 	label_dir = gtk_label_new("Dirección IP: ");
 	entry_dir = gtk_entry_new();
+	gtk_entry_set_text(GTK_ENTRY(entry_dir), "127.0.0.1");
 	gtk_entry_set_alignment(GTK_ENTRY(entry_dir), 0.5);
 	gtk_widget_set_name(GTK_WIDGET(entry_dir), "entry_conexion");
 
 	label_puerto = gtk_label_new("Puerto: ");
 	entry_puerto = gtk_entry_new();
+	gtk_entry_set_text(GTK_ENTRY(entry_puerto), "7777");
 	gtk_entry_set_alignment(GTK_ENTRY(entry_puerto), 0.5);
 	gtk_widget_set_name(GTK_WIDGET(entry_puerto), "entry_conexion");
 
@@ -260,93 +271,18 @@ int main (int argc, char *argv[])
 	gtk_container_add(GTK_CONTAINER(contenedor), separador_con);
 	gtk_widget_set_name(GTK_WIDGET(separador_con), "separador_con");
 
-	//Cremos el visor de archivos
-	file_viewer = gtk_icon_view_new_with_model(create_and_fill_model());
-	cout << file_viewer << endl;
-	gtk_icon_view_set_text_column (GTK_ICON_VIEW (file_viewer), COL_DISPLAY_NAME);
-	gtk_icon_view_set_pixbuf_column (GTK_ICON_VIEW (file_viewer), COL_PIXBUF);
-	gtk_icon_view_set_selection_mode (GTK_ICON_VIEW (file_viewer), GTK_SELECTION_MULTIPLE);
+	//Creamos el struct para pasar los datos de conexion a conectar.
+	info_conexion->entry_direccion = entry_dir;
+	info_conexion->entry_puerto = entry_puerto;
+	info_conexion->button_conectar = toolbar_conectar;
+	info_conexion->estado = 1;
 
-	//Creamos el area de scroll
-	scrolled_window = gtk_scrolled_window_new (NULL, NULL);
-	gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolled_window), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-	gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (scrolled_window), GTK_SHADOW_IN);
-
-
-	//g_signal_connect (toolbar_conectar, "clicked", G_CALLBACK (Imprimir), entry);
+	//Señal del boton conectar de la toolbar.
+	g_signal_connect (toolbar_conectar, "clicked", G_CALLBACK (on_conectar_clicked), info_conexion);
 	g_signal_connect (window, "destroy", G_CALLBACK (gtk_main_quit), NULL);
 	g_signal_connect(G_OBJECT(salir), "activate", G_CALLBACK(gtk_main_quit), NULL);
 	g_signal_connect(G_OBJECT(acerca_de), "activate", G_CALLBACK(AcercaDe), NULL);
-	g_signal_connect(G_OBJECT(file_viewer), "item-activated", G_CALLBACK(on_item_activated), NULL);
-	g_signal_connect(G_OBJECT(toolbar_conectar), "clicked", G_CALLBACK(on_conectar_clicked), file_viewer);
-	//--------------------------------------BOTONERA Y CABECERA VISOR DE ARCHIVOS--------------------
-	ev_bot_visor = gtk_event_box_new();
-	cont_visor = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
-	cont_bot_visor = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
-	gtk_container_add(GTK_CONTAINER(ev_bot_visor), cont_bot_visor);
-	gtk_widget_set_size_request(GTK_WIDGET(ev_bot_visor), 0, 25);
-	gtk_widget_set_name(GTK_WIDGET(ev_bot_visor), "botonera_visor");
-	gtk_container_add(GTK_CONTAINER(cont_visor), ev_bot_visor);
-	gtk_box_pack_start(GTK_BOX(cont_visor), scrolled_window, 1, 1, 0);
-
-	//Botones del visor
-	but_ord_arc = gtk_button_new();
-	gtk_box_pack_start(GTK_BOX(cont_bot_visor), but_ord_arc, 0, 0, 0);
-	gtk_widget_set_name(GTK_WIDGET(but_ord_arc), "bot_visor");
-	GtkWidget *img_but_ord;
-	img_but_ord = gtk_image_new_from_file("Images/ord_des.png");
-	gtk_button_set_image(GTK_BUTTON(but_ord_arc),img_but_ord);
-	gtk_button_set_relief(GTK_BUTTON(but_ord_arc), GTK_RELIEF_NONE);
-	gtk_widget_set_size_request(GTK_WIDGET(but_ord_arc), 27, 0);
-
-	but_ord_asc = gtk_button_new();
-	gtk_box_pack_start(GTK_BOX(cont_bot_visor), but_ord_asc, 0, 0, 0);
-	gtk_widget_set_name(GTK_WIDGET(but_ord_asc), "bot_visor");
-	GtkWidget *img_but_asc;
-	img_but_asc = gtk_image_new_from_file("Images/ord_asc.png");
-	gtk_button_set_image(GTK_BUTTON(but_ord_asc),img_but_asc);
-	gtk_button_set_relief(GTK_BUTTON(but_ord_asc), GTK_RELIEF_NONE);
-	gtk_widget_set_size_request(GTK_WIDGET(but_ord_asc), 27, 0);
-
-	but_ord_del = gtk_button_new();
-	gtk_container_add(GTK_CONTAINER(cont_bot_visor), but_ord_del);
-	gtk_widget_set_name(GTK_WIDGET(but_ord_del), "bot_visor");
-	GtkWidget *img_but_del;
-	img_but_del = gtk_image_new_from_file("Images/delete.png");
-	gtk_button_set_image(GTK_BUTTON(but_ord_del),img_but_del);
-	gtk_button_set_relief(GTK_BUTTON(but_ord_del), GTK_RELIEF_NONE);
-	gtk_widget_set_size_request(GTK_WIDGET(but_ord_del), 27, 0);
-
-	but_sub = gtk_button_new();
-	gtk_container_add(GTK_CONTAINER(cont_bot_visor), but_sub);
-	gtk_widget_set_name(GTK_WIDGET(but_sub), "bot_visor");
-	GtkWidget *img_but_sub;
-	img_but_sub = gtk_image_new_from_file("Images/subir.png");
-	gtk_button_set_image(GTK_BUTTON(but_sub),img_but_sub);
-	gtk_button_set_relief(GTK_BUTTON(but_sub), GTK_RELIEF_NONE);
-	gtk_widget_set_size_request(GTK_WIDGET(but_sub), 27, 0);
-
-	but_desc = gtk_button_new();
-	gtk_container_add(GTK_CONTAINER(cont_bot_visor), but_desc);
-	gtk_widget_set_name(GTK_WIDGET(but_desc), "bot_visor");
-	GtkWidget *img_but_desc;
-	img_but_desc = gtk_image_new_from_file("Images/desc.png");
-	gtk_button_set_image(GTK_BUTTON(but_desc),img_but_desc);
-	gtk_button_set_relief(GTK_BUTTON(but_desc), GTK_RELIEF_NONE);
-	gtk_widget_set_size_request(GTK_WIDGET(but_desc), 27, 0);
-
-	//Label del visor de archivos
-	label_visor = gtk_label_new("Visor de archivos");
-	gtk_box_pack_start(GTK_BOX(cont_bot_visor), label_visor, 1, 1, 0);
-
-	//Label y entry buscar
-	label_buscar = gtk_label_new("Buscar: ");
-	entry_buscar = gtk_entry_new();
-	image_entry_buscar = gdk_pixbuf_new_from_file("Images/search.png", &g);
-	gtk_entry_set_icon_from_pixbuf(GTK_ENTRY(entry_buscar), GTK_ENTRY_ICON_PRIMARY, image_entry_buscar);
-	gtk_widget_set_name(GTK_WIDGET(entry_buscar), "entry_buscar");
-	gtk_box_pack_start(GTK_BOX(cont_bot_visor), label_buscar, 0, 0, 0);
-	gtk_box_pack_start(GTK_BOX(cont_bot_visor), entry_buscar, 0, 0, 0);
+	//g_signal_connect(G_OBJECT(toolbar_conectar), "clicked", G_CALLBACK(on_conectar_clicked), file_viewer);
 
 	//Posicionamos el visor de archivo
 	cont_cuerpo = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
@@ -354,35 +290,42 @@ int main (int argc, char *argv[])
 	iz_borrar = gtk_event_box_new();
 	gtk_widget_set_size_request(GTK_WIDGET(iz_borrar), 250, 0);
 	gtk_box_pack_start(GTK_BOX(cont_cuerpo),iz_borrar, 0, 0, 0);
-	gtk_box_pack_start(GTK_BOX(cont_cuerpo),cont_visor, 1, 1, 10);
 
-	gtk_container_add (GTK_CONTAINER (scrolled_window), file_viewer);
-	gtk_widget_set_name(GTK_WIDGET(file_viewer),"scrolled_window");
+	//Creamos el visor de archivos
+	FileViewer file_viewer(cont_cuerpo);
+	//Metemos el file_viewer en la configuración
+	Configuracion::get_instance()->file_viewer = &file_viewer;
 
-	//----------------------------------------------------------------------------------------------
-
-	//------------------------------------------FINAL DEL VISOR-------------------------------------
-	cont_final_visor = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
-	ev_final_visor = gtk_event_box_new();
-	gtk_container_add(GTK_CONTAINER(cont_visor), ev_final_visor);
-	gtk_widget_set_name(GTK_WIDGET(ev_final_visor), "final_visor");
-	gtk_widget_set_size_request(GTK_WIDGET(ev_final_visor), 0, 20);
-	label_num_archivos = gtk_label_new("Total: 67 archivos");
-	gtk_container_add(GTK_CONTAINER(ev_final_visor), cont_final_visor);
-	gtk_box_pack_start(GTK_BOX(cont_final_visor), label_num_archivos, 0, 0, 10);
 	gtk_box_pack_start(GTK_BOX(contenedor), cont_cuerpo, 1, 1 ,10);
+
+	info_conexion->file_viewer = &file_viewer;
 	//----------------------------------------------------------------------------------------------
 
 	//Creamos la barra de estado y la anyadimos
-	barra_estado = gtk_statusbar_new();
+	barra_estado = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+	label_servidor = gtk_label_new("Esperando conexiones...");
+	img_info_barra_estado = gtk_image_new_from_file("Images/info.png");
 	gtk_widget_set_size_request(GTK_WIDGET(barra_estado), 0, 30);
 	ev_barra_estado = gtk_event_box_new();
 	gtk_widget_set_name(GTK_WIDGET(ev_barra_estado), "barra_estado");
-	gtk_statusbar_push(GTK_STATUSBAR(barra_estado), 1, "Estado: Desconectado");
+	gtk_box_pack_start(GTK_BOX(barra_estado), img_info_barra_estado, 0, 0, 10);
+	gtk_box_pack_start(GTK_BOX(barra_estado), label_servidor, 0, 0, 0);
 	gtk_container_add(GTK_CONTAINER(ev_barra_estado), barra_estado);
 	gtk_container_add(GTK_CONTAINER(contenedor), ev_barra_estado);
 
 	gtk_widget_show_all(window);
+
+	//-----------------------------INICIO SERVER----------------------------------------------
+	pthread_t thread_escuchar;
+	pthread_create(&thread_escuchar, NULL, Escuchar, (void *)&label_servidor);
+	//----------------------------------------------------------------------------------------
+
+	//------------------------------CLIENTE---------------------------------------------------
+	Cliente cliente;
+	Cliente *clientePtr = &cliente;
+	info_conexion->cliente = clientePtr;
+	data_threads.label_servidor = label_servidor;
+	//----------------------------------------------------------------------------------------
 
 	gtk_main();
 }
@@ -401,68 +344,181 @@ void AcercaDe()
 	cout << "Menu item acerca de seleccionado" << endl;
 }
 
-GtkTreeModel *create_and_fill_model ()
+void on_conectar_clicked(GtkWidget *widget, InfoConexion *info)
 {
-  GtkListStore *list_store;
-  GdkPixbuf *p1, *p2;
-  GtkTreeIter iter;
-  GError *err = NULL;
+	string direccion, str_puerto;
+	int puerto;
+	GtkWidget *img_desconectar = gtk_image_new_from_file("Images/close.png");
+	GtkWidget *img_conectar = gtk_image_new_from_file("Images/conectar.png");
+	vector<Archivo> v_resultados;
 
-  p1 = gdk_pixbuf_new_from_file ("Images/conectar.png", &err);
-                            /* No error checking is done here */
-  p2 = gdk_pixbuf_new_from_file ("image2.png", &err);
+	direccion = gtk_entry_get_text(GTK_ENTRY(info->entry_direccion));
+	str_puerto = gtk_entry_get_text(GTK_ENTRY(info->entry_puerto));
 
-  list_store = gtk_list_store_new (NUM_COLS, G_TYPE_STRING, GDK_TYPE_PIXBUF);
-
-  //Añadimos los items
-  gtk_list_store_append (list_store, &iter);
-  gtk_list_store_set (list_store, &iter, COL_DISPLAY_NAME, "Image1", COL_PIXBUF, p1, -1);
-  gtk_list_store_append (list_store, &iter);
-  gtk_list_store_set (list_store, &iter, COL_DISPLAY_NAME, "Image2", COL_PIXBUF, p2, -1);
-
-  return GTK_TREE_MODEL (list_store);
-}
-
-
-void on_item_activated (GtkTreeView *view, GtkTreePath *path, GtkTreeViewColumn *col, gpointer userdata)
-{
-	GtkTreeIter   iter;
-	GtkTreeModel *model;
-
-	model = gtk_icon_view_get_model(GTK_ICON_VIEW(view));
-
-	if (gtk_tree_model_get_iter(model, &iter, path))
+	if (info->estado == 1)
 	{
-		gchar *name;
+		if (ValidarConexion(direccion, str_puerto))
+		{
+			puerto = atoi(str_puerto.c_str());
 
-		gtk_tree_model_get(model, &iter, COL_DISPLAY_NAME, &name, -1);
+			if (direccion != "" && str_puerto != "")
+			{
+				try
+				{
+					if (info->cliente->GetEstado() != "conectado")
+						info->cliente->Conectar(direccion, puerto);
 
-		g_print ("The row containing the name '%s' has been double-clicked.\n", name);
+					//data_threads.cliente = info->cliente;
+					Configuracion::get_instance()->cliente = info->cliente;
+				}
+				catch (ExcepcionPersonalizada &e)
+				{
+					cout << e.what() << endl;
+				}
 
-		g_free(name);
+				//Cambiamos el boton de conectar, a desconectar
+				gtk_button_set_image(GTK_BUTTON(info->button_conectar), img_desconectar);
+				gtk_button_set_label(GTK_BUTTON(info->button_conectar), "Desconectar");
+				//Ponemos el estado de conexion a 0(Conectado).
+				info->estado = 0;
+				//Pedimos las rutas
+				info->cliente->EnviarDatos("/");
+				info->cliente->DeserializarObjeto(v_resultados);
+				info->file_viewer->set_items(v_resultados);
+
+			}
+		}
+		else
+		{
+			Mensaje mensaje("Error de conexión!", "Datos de conexión no validados. Debes rellenar los campos de conexion.", info->ventana_principal);
+		}
+	}
+	else
+	{
+		//Si estamos conectados y le damos al boton de desconectar, desconectamos al cliente.
+		info->cliente->Cerrar();
+		//Volvemos a cambiar el boton de desconectar a desconectar
+		gtk_button_set_image(GTK_BUTTON(info->button_conectar), img_conectar);
+		gtk_button_set_label(GTK_BUTTON(info->button_conectar), "Conectar");
+		//Ponemos el estado a 1(Desconectato)
+		info->estado = 1;
 	}
 }
 
-void on_conectar_clicked(GtkWidget *widget, gpointer c)
+
+void *Escuchar(void *info)
 {
-	 GtkListStore *list_store;
-	  GdkPixbuf *p1, *p2;
-	  GtkTreeIter iter;
-	  GError *err = NULL;
+	string mensaje;
+	vector<string> v_resultados;
+	vector<Archivo> v_archivos;
+	GFile *file;
+	GFileInfo *file_info;
+	GError *error;
+	const char *tipo_archivo;
 
-	  p1 = gdk_pixbuf_new_from_file ("Images/conectar.png", &err);
-								/* No error checking is done here */
-	  p2 = gdk_pixbuf_new_from_file ("image2.png", &err);
+	Server server(7777);
+	//Pasamos la direccion de memoria del campo estado de la barra de estado, para poder modificar
+	//lo en el servidor.
+	server.SetLabelEstado(GTK_WIDGET(data_threads.label_servidor));
 
-	  list_store = gtk_list_store_new (NUM_COLS, G_TYPE_STRING, GDK_TYPE_PIXBUF);
+	while (1)
+	{
+		//Ponemos el server a escuchar!!!
+		server.Escuchar();
 
-	  //Añadimos los items
-	  gtk_list_store_append (list_store, &iter);
-	  gtk_list_store_set (list_store, &iter, COL_DISPLAY_NAME, "Pene", COL_PIXBUF, p1, -1);
-	  gtk_list_store_append (list_store, &iter);
-	  gtk_list_store_set (list_store, &iter, COL_DISPLAY_NAME, "Culo", COL_PIXBUF, p2, -1);
+		//Recibimos el mensaje de cliente
+		mensaje = server.RecibirDatos();
 
-	  gtk_icon_view_set_model(GTK_ICON_VIEW(c), GTK_TREE_MODEL(list_store));
+		//Realizamos la operacion pertinente
+		while (mensaje != "salir" || server.GetEstadoCliente() != "desconectado")
+		{
+			cout << "El mensaje es: " << mensaje << endl;
+			cout << "Longitud: " << mensaje.length() << endl;
+
+			try
+			{
+				Directorio::ListarDirectorio(mensaje, v_resultados);
+				cout << "gadfsñkhhdscdsgfu" << endl;
+			}
+			catch (exception &e)
+			{
+				cout << "ERROR!!!" << endl;
+			}
+
+			//v_archivos.clear();
+
+			for (unsigned int i = 0; i < v_resultados.size(); i++)
+			{
+				//Obtenemos el mimetype del archivo
+				file = g_file_new_for_path((mensaje + "/" + v_resultados[i]).c_str());
+				file_info = g_file_query_info(file, "standard::*", G_FILE_QUERY_INFO_NONE, NULL, &error);
+				tipo_archivo = g_file_info_get_content_type (file_info);
+				//Creamos un vector de objetos archivo para enviarlo al cliente
+				Archivo archivo(v_resultados[i], mensaje + "/", tipo_archivo, 0);
+				//cout << tipo_archivo << endl;
+				v_archivos.push_back(archivo);
+			}
+
+			//Si en la configuracion esta puesto que no mostremos archivos ocultos los eliminamos del vector
+			if (!Configuracion::get_instance()->mostrar_archivos_ocultos)
+				EliminarArchivosOcultos(v_archivos);
+
+			//Limpiamos el mensaje
+			mensaje.clear();
+			//Enviamos los datos
+			server.SerializarObjeto(v_archivos);
+
+			//Esperamos otra comunicacion del cliente
+			mensaje = server.RecibirDatos();
+		}
+	}
+
+	return 0;
 }
 
+void gtk_main_quit()
+{
+	data_threads.server->Close();
+}
 
+bool ValidarConexion(string direccion, string str_puerto)
+{
+	int contador_puntos = 0, octeto, puerto;
+	string str_octeto;
+	bool en_rango = true, correcta = false;
+
+	for (unsigned int i = 0; i < direccion.length() && en_rango; i++)
+	{
+		if (direccion[i] == '.')
+		{
+			octeto = atoi(str_octeto.c_str());
+
+			if (octeto > 255)
+				en_rango = false;
+
+			contador_puntos++;
+			str_octeto = "";
+		}
+		str_octeto += direccion[i];
+	}
+
+	puerto = atoi(str_puerto.c_str());
+
+	if (en_rango && contador_puntos == 3 && puerto < 65535)
+		correcta = true;
+
+	return correcta;
+}
+
+void EliminarArchivosOcultos(vector<Archivo> &v_archivos)
+{
+	for (unsigned int i = 0; i < v_archivos.size(); i++)
+	{
+		if (v_archivos[i].get_nombre()[0] == '.')
+		{
+			v_archivos[i] = v_archivos.back();
+			v_archivos.pop_back();
+			i--;
+		}
+	}
+}
