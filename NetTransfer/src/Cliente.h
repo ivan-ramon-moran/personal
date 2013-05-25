@@ -29,11 +29,11 @@ public:
 	//Operaciones permitidas
 	void Conectar(string direccion_ip, int puerto);
 	void EnviarDatos(string mensaje);
+	string RecibirDatos();
 	void RecibirDatos(vector<string> &v_resultado);
 	void SendReady();
 	void RecibirFichero();
 	void EnviarArchivo(string path);
-	string ObtenerNombreFichero(string path);
 	bool GetReady();
 	void Cerrar();
 	void DeserializarObjeto(vector<Archivo> &v_archivos);
@@ -45,6 +45,7 @@ private:
 	struct sockaddr_in server;
 	char message[1000] , server_reply[2000];
 	string estado;
+	string ObtenerNombreFichero(string path);
 };
 
 #endif /* CLIENTE_H_ */

@@ -16,17 +16,18 @@ public:
 private:
 	GtkWidget *contenido;
 	GtkWidget *label_usuario;
-	GtkWidget *entry_usuario;
 	GtkWidget *label_password;
-	GtkWidget *entry_password;
 	GtkWidget *cont_fixed;
 	GtkWidget *img_password;
 	GtkWidget *boton_aceptar;
 	GtkWidget *boton_cancelar;
 	GtkWidget *cont_botones;
 	GtkWidget *ventana;
+	GtkWidget *entry_usuario;
+	GtkWidget *entry_password;
 
 	static void on_boton_aceptar_clicked();
+	static void on_boton_cancelar_clicked();
 
 };
 

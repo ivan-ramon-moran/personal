@@ -11,6 +11,7 @@ using namespace std;
 #ifndef MENSAJE_H_
 #define MENSAJE_H_
 
+//ESTO ESTA PARA ARREGLAR Y PASAR A CONFIGURACION
 static GtkWidget *ventana;
 static void cerrar_ventana();
 

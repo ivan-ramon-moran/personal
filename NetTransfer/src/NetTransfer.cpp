@@ -21,35 +21,13 @@
 #include "Mensaje.h"
 #include "Archivo.h"
 #include "DAutentificacion.h"
+#include <thread>
 
 using namespace std;
 
-struct InfoConexion
-{
-	GtkWidget *entry_direccion;
-	GtkWidget *entry_puerto;
-	Cliente *cliente;
-	GtkWidget *button_conectar;
-	FileViewer *file_viewer;
-	GtkWidget *label_servidor;
-	GtkWidget *ventana_principal;
-	//0 para conectado y 1 para desconectado
-	int estado;
-};
-
-struct CompartirConThreads
-{
-	Server *server;
-	GtkWidget *label_servidor;
-	Cliente *cliente;
-};
-
-CompartirConThreads data_threads;
-
-void Imprimir(GtkWidget *widget, gpointer *callback_data);
 void AcercaDe();
-void on_conectar_clicked(GtkWidget *widget, InfoConexion* c);
-void *Escuchar(void *threadid);
+void on_conectar_clicked();
+void ThreadEscuchar();
 bool ValidarConexion(string direccion, string str_puerto);
 void EliminarArchivosOcultos(vector<Archivo> &v_archivos);
 void EnviarDirectorios(string ruta);
@@ -119,10 +97,8 @@ int main (int argc, char *argv[])
 
 	gtk_init(&argc, &argv);
 	window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-	InfoConexion *info_conexion = new InfoConexion;
-	info_conexion->ventana_principal = window;
 	Configuracion::get_instance()->ventana_principal = window;
-
+    gtk_window_set_position(GTK_WINDOW (window),GTK_WIN_POS_CENTER);
 	gtk_widget_set_name(GTK_WIDGET(window), "vent_principal");
 	gtk_window_set_default_size(GTK_WINDOW(window),1000, 600);
 	gtk_window_set_title(GTK_WINDOW(window), "NetTransfer - Share your files!!!");
@@ -288,13 +264,13 @@ int main (int argc, char *argv[])
 	gtk_widget_set_name(GTK_WIDGET(separador_con), "separador_con");
 
 	//Creamos el struct para pasar los datos de conexion a conectar.
-	info_conexion->entry_direccion = entry_dir;
-	info_conexion->entry_puerto = entry_puerto;
-	info_conexion->button_conectar = toolbar_conectar;
-	info_conexion->estado = 1;
+	Configuracion::get_instance()->entry_direccion = entry_dir;
+	Configuracion::get_instance()->entry_puerto = entry_puerto;
+	Configuracion::get_instance()->boton_conectar = toolbar_conectar;
+	Configuracion::get_instance()->estado = 1;
 
 	//Señal del boton conectar de la toolbar.
-	g_signal_connect (toolbar_conectar, "clicked", G_CALLBACK (on_conectar_clicked), info_conexion);
+	g_signal_connect (toolbar_conectar, "clicked", G_CALLBACK (on_conectar_clicked), NULL);
 	g_signal_connect (window, "destroy", G_CALLBACK (gtk_main_quit), NULL);
 	g_signal_connect(G_OBJECT(salir), "activate", G_CALLBACK(gtk_main_quit), NULL);
 	g_signal_connect(G_OBJECT(acerca_de), "activate", G_CALLBACK(AcercaDe), NULL);
@@ -360,7 +336,7 @@ int main (int argc, char *argv[])
 
 	gtk_box_pack_start(GTK_BOX(contenedor), cont_cuerpo, 1, 1 ,10);
 
-	info_conexion->file_viewer = &file_viewer;
+	Configuracion::get_instance()->file_viewer = &file_viewer;
 	//----------------------------------------------------------------------------------------------
 
 	//Creamos la barra de estado y la anyadimos
@@ -378,15 +354,13 @@ int main (int argc, char *argv[])
 	gtk_widget_show_all(window);
 
 	//-----------------------------INICIO SERVER----------------------------------------------
-	pthread_t thread_escuchar;
-	pthread_create(&thread_escuchar, NULL, Escuchar, (void *)&label_servidor);
+	std::thread thread_escuchar(ThreadEscuchar);
 	//----------------------------------------------------------------------------------------
 
 	//------------------------------CLIENTE---------------------------------------------------
 	Cliente cliente;
 	Cliente *clientePtr = &cliente;
-	info_conexion->cliente = clientePtr;
-	data_threads.label_servidor = label_servidor;
+	Configuracion::get_instance()->cliente = clientePtr;
 	//----------------------------------------------------------------------------------------
 
 	gtk_main();
@@ -406,18 +380,18 @@ void AcercaDe()
 	cout << "Menu item acerca de seleccionado" << endl;
 }
 
-void on_conectar_clicked(GtkWidget *widget, InfoConexion *info)
+void on_conectar_clicked()
 {
-	string direccion, str_puerto;
+	string direccion, str_puerto, estado_autentificacion;;
 	int puerto;
 	GtkWidget *img_desconectar = gtk_image_new_from_file("Images/close.png");
 	GtkWidget *img_conectar = gtk_image_new_from_file("Images/conectar.png");
 	vector<Archivo> v_resultados;
 
-	direccion = gtk_entry_get_text(GTK_ENTRY(info->entry_direccion));
-	str_puerto = gtk_entry_get_text(GTK_ENTRY(info->entry_puerto));
+	direccion = gtk_entry_get_text(GTK_ENTRY(Configuracion::get_instance()->entry_direccion));
+	str_puerto = gtk_entry_get_text(GTK_ENTRY(Configuracion::get_instance()->entry_puerto));
 
-	if (info->estado == 1)
+	if (Configuracion::get_instance()->estado == 1)
 	{
 		if (ValidarConexion(direccion, str_puerto))
 		{
@@ -427,62 +401,78 @@ void on_conectar_clicked(GtkWidget *widget, InfoConexion *info)
 			{
 				try
 				{
-					if (info->cliente->GetEstado() != "conectado")
+					if (Configuracion::get_instance()->cliente->GetEstado() != "conectado")
 					{
-						info->cliente->Conectar(direccion, puerto);
 						DAutentificacion d_aut(Configuracion::get_instance()->ventana_principal);
+
+						//Si el usuario ha pulsado aceptar en la ventana de autentificación, conectamos y mandamos los datos de autentificacion.
+						if (Configuracion::get_instance()->usuario != "" && Configuracion::get_instance()->password != "")
+						{
+							//Conectamos al cliente y enviamos los datos de autentificacion
+							Configuracion::get_instance()->cliente->Conectar(direccion, puerto);
+							Configuracion::get_instance()->cliente->EnviarDatos(Configuracion::get_instance()->usuario);
+							Configuracion::get_instance()->cliente->EnviarDatos(Configuracion::get_instance()->password);
+							estado_autentificacion = Configuracion::get_instance()->cliente->RecibirDatos();
+
+							if (estado_autentificacion == "ok")
+							{
+								//Cambiamos el boton de conectar, a desconectar
+								gtk_button_set_image(GTK_BUTTON(Configuracion::get_instance()->boton_conectar), img_desconectar);
+								gtk_button_set_label(GTK_BUTTON(Configuracion::get_instance()->boton_conectar), "Desconectar");
+								//Ponemos el estado de conexion a 0(Conectado).
+								Configuracion::get_instance()->estado = 0;
+								//Pedimos las rutas
+								Configuracion::get_instance()->cliente->EnviarDatos("/");
+								Configuracion::get_instance()->cliente->DeserializarObjeto(v_resultados);
+								Configuracion::get_instance()->file_viewer->set_items(v_resultados);
+							}
+							else
+								//Mostramos un mensaje de error indicando fallo en la autentificacion.
+								Mensaje mensaje("Error de autentificación", "No se ha podido auntentificar el cliente", Configuracion::get_instance()->ventana_principal);
+						}
 					}
-					//data_threads.cliente = info->cliente;
-					Configuracion::get_instance()->cliente = info->cliente;
 				}
 				catch (ExcepcionPersonalizada &e)
 				{
 					cout << e.what() << endl;
 				}
-
-				//Cambiamos el boton de conectar, a desconectar
-				gtk_button_set_image(GTK_BUTTON(info->button_conectar), img_desconectar);
-				gtk_button_set_label(GTK_BUTTON(info->button_conectar), "Desconectar");
-				//Ponemos el estado de conexion a 0(Conectado).
-				info->estado = 0;
-				//Pedimos las rutas
-				info->cliente->EnviarDatos("/");
-				info->cliente->DeserializarObjeto(v_resultados);
-				info->file_viewer->set_items(v_resultados);
-
 			}
 		}
 		else
 		{
-			Mensaje mensaje("Error de conexión!", "Datos de conexión no validados. Debes rellenar los campos de conexion.", info->ventana_principal);
+			Mensaje mensaje("Error de conexión!", "Datos de conexión no validados. Debes rellenar los campos de conexion.", Configuracion::get_instance()->ventana_principal);
 		}
 	}
 	else
 	{
 		//Si estamos conectados y le damos al boton de desconectar, desconectamos al cliente.
-		info->cliente->Cerrar();
+		Configuracion::get_instance()->cliente->Cerrar();
 		//Volvemos a cambiar el boton de desconectar a desconectar
-		gtk_button_set_image(GTK_BUTTON(info->button_conectar), img_conectar);
-		gtk_button_set_label(GTK_BUTTON(info->button_conectar), "Conectar");
+		gtk_button_set_image(GTK_BUTTON(Configuracion::get_instance()->boton_conectar), img_conectar);
+		gtk_button_set_label(GTK_BUTTON(Configuracion::get_instance()->boton_conectar), "Conectar");
 		//Ponemos el estado a 1(Desconectato)
-		info->estado = 1;
+		Configuracion::get_instance()->estado = 1;
 	}
 }
 
 
-void *Escuchar(void *info)
+void ThreadEscuchar()
 {
-	string mensaje;
+	string mensaje, usuario, password;
 	Server server(7777);
 	//Pasamos la direccion de memoria del campo estado de la barra de estado, para poder modificar
 	//lo en el servidor.
-	server.SetLabelEstado(GTK_WIDGET(data_threads.label_servidor));
+	//server.SetLabelEstado(GTK_WIDGET(Configuracion::get_instance()->label_servidor));
 	Configuracion::get_instance()->server = &server;
 
 	while (1)
 	{
 		//Ponemos el server a escuchar!!!
 		server.Escuchar();
+		//Autentificación por parte del usuario
+		usuario = server.RecibirDatos();
+		password = server.RecibirDatos();
+		server.EnviarDatos("ok");
 
 		//Realizamos la operacion pertinente
 		while (mensaje != "salir" || server.GetEstadoCliente() != "desconectado")
@@ -492,13 +482,13 @@ void *Escuchar(void *info)
 			EnviarDirectorios(mensaje);
 		}
 	}
-
-	return 0;
 }
 
 void gtk_main_quit()
 {
-	data_threads.server->Close();
+	Configuracion::get_instance()->server->Close();
+	if (Configuracion::get_instance()->estado == 0)
+		Configuracion::get_instance()->cliente->Cerrar();
 }
 
 bool ValidarConexion(string direccion, string str_puerto)

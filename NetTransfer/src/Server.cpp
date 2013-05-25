@@ -51,7 +51,7 @@ void Server::Escuchar()
 
 	//La conexion ha sido aceptada por lo tanto lo ponemos en el estado
 	estado_servidor = "Conectado";
-	gtk_label_set_text(GTK_LABEL(label_estado), "Conectado");
+	//gtk_label_set_text(GTK_LABEL(label_estado), "Conectado");
 	puts("Connection accepted");
 	this->estado_cliente = "Conectado con: ";
 }
@@ -91,13 +91,12 @@ string Server::RecibirDatos()
 	return resultado;
 }
 
-void Server::EnviarDatos(char cadena[])
+void Server::EnviarDatos(string mensaje)
 {
-	if (write(client_sock, cadena, strlen(cadena)) < 0)
-	    cout << "Error en la transferencia";
+	if (write(client_sock, mensaje.c_str(), strlen(mensaje.c_str())) < 0)
+		cout << "Error en la transferencia";
 	else
 		GetReady();
-
 }
 
 void Server::EnviarDatos(vector<string> &vector)

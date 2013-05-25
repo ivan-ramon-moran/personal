@@ -129,8 +129,34 @@
 	background: linear-gradient(to bottom, #f6f4f4 20%,#e7e5e6 80%);
 }
 
+#boton_aceptar_aut
+{
+	background: linear-gradient(to bottom, #e2e4e5 20%,#c4c7c9 80%);
+	box-shadow: 0 0 1px 1px #b8babc;
+	border-radius: 7px;
+}
+
+#boton_aceptar_aut:active
+{
+	background: #e1e2e3;
+	border-radius: 7px;
+}
+
+#boton_cancelar_aut
+{
+	background: linear-gradient(to bottom, #e2e4e5 20%,#c4c7c9 80%);
+	box-shadow: 0 0 1px 1px #b8babc;
+	border-radius: 7px;
+}
+
+#boton_cancelar_aut:active
+{
+	background: #e1e2e3;
+	border-radius: 7px;
+}
+
 GtkButton
  {
 	-GtkWidget-focus-line-width: 0;
 	border-width: 1px;
-	}
+}

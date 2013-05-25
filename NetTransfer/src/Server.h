@@ -21,14 +21,12 @@ using namespace std;
 
 class Server
 {
-	typedef  void* (Server::*ServerPtr)(void);
-	typedef  void* (*PthreadPtr)(void*);
 public:
 	Server();
 	Server(int port);
 	void Escuchar();
-	void EnviarDatos(char []);
 	void EnviarDatos(int numero);
+	void EnviarDatos(string mensaje);
 	void EnviarDatos(vector<string> &vector);
 	void EnviarArchivo(string path);
 	bool GetReady();
@@ -41,7 +39,6 @@ public:
 	string GetEstado();
 	void SetLabelEstado(GtkWidget *label);
 	void SerializarObjeto(vector<Archivo> &vector);
-	//void SetConf(Config &config);
 
 private:
 	int socket_desc, client_sock , c , read_size;

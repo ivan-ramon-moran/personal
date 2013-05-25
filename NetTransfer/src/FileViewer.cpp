@@ -125,9 +125,7 @@ GtkTreeModel* FileViewer::create_and_fill_model ()
 
 	for (unsigned int i = 0; i < elementos.size(); i++)
 	{
-		cout << elementos[i].get_nombre() << endl;
 		tipo = ObtenerTipo(elementos.at(i).get_tipo());
-		cout << "2" << endl;
 		gtk_list_store_append (list_store, &iter);
 
 		//Añadimos los items
@@ -223,8 +221,6 @@ void FileViewer::on_item_activated (GtkTreeView *view, gpointer userdata)
 	}
 	else
 		cout << "No estas conectado a ningun servidor." << endl;
-
-	cout << "Item: " << item_seleccionado << endl;
 }
 
 void FileViewer::on_item_one_click(GtkWidget *icon_view, gpointer userdata)
@@ -245,7 +241,6 @@ void FileViewer::on_item_one_click(GtkWidget *icon_view, gpointer userdata)
 		//Buscamos el item en el vector de archivos
 		posicion_item = buscar_item(item);
 		item_seleccionado = item;
-		cout << "Item:" << item_seleccionado << endl;
 		//Extraemos el archivo y seteamos los valores en el visor de archivos
 		Archivo arch = Configuracion::get_instance()->elementos.at(posicion_item);
 		gtk_label_set_text(GTK_LABEL(Configuracion::get_instance()->label_nombre), arch.get_nombre().c_str());

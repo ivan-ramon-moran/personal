@@ -267,3 +267,29 @@ void Cliente::Cerrar()
 	shutdown(sock, 2);
 	estado = "desconectado";
 }
+
+string Cliente::RecibirDatos()
+{
+	string resultado;
+	int read_size;
+
+	bzero(message, 2000);
+	read_size = recv(sock , message , 1000 , 0);
+
+	if(read_size == 0)
+	{
+		puts("Client disconnected");
+		resultado = "salir";
+		fflush(stdout);
+	}
+	else if(read_size == -1)
+	{
+		perror("recv failed");
+	}
+	else
+		resultado = Array2String(message, read_size);
+
+	SendReady();
+
+	return resultado;
+}

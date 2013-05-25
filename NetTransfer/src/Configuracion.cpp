@@ -3,6 +3,7 @@
 Configuracion::Configuracion()
 {
 	mostrar_archivos_ocultos = false;
+	estado = 1;
 }
 
 Configuracion* Configuracion::instance = 0;// Inicializar el puntero
