@@ -15,6 +15,7 @@ int main()
 {
 	sqlite3 *data_base;
 	sqlite3_stmt *resultado;
+    const char* siguiente;      /* puntero a la siguiente sentencia */
 	char *error;
 	string sentencia;
 	int res_ope;
@@ -25,6 +26,24 @@ int main()
 
 	if (res_ope == SQLITE_OK)
 		cout << "Operacion realizada!!!" << endl;
+
+	sentencia = "INSERT INTO usuarios (id, usuario, password) VALUES ('1', 'ivan', 'kernel')";
+	res_ope = sqlite3_exec(data_base,sentencia.c_str(),NULL,NULL,&error);
+
+	if (res_ope == SQLITE_OK)
+			cout << "Operacion realizada!!!" << endl;
+
+	sentencia = "SELECT * FROM usuarios";
+	res_ope = sqlite3_prepare(data_base, sentencia.c_str(), sentencia.length(), &resultado, &siguiente);
+
+
+	while (sqlite3_step(resultado) == SQLITE_ROW)
+	{
+		cout << sqlite3_column_int(resultado, 0) << endl;
+		cout << sqlite3_column_text(resultado, 1) << endl;
+		cout << sqlite3_column_text(resultado, 2) << endl;
+
+	}
 
 	sqlite3_close(data_base);
 
