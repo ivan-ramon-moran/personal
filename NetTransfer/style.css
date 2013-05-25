@@ -114,9 +114,23 @@
 	background: linear-gradient(to bottom, #f6f4f4 20%,#e7e5e6 80%);
 }
 
+#entry_usuario
+{
+	border-radius: 15px;
+}
+
+#entry_password
+{
+	border-radius: 15px;
+}
+
+#ventana_aut
+{
+	background: linear-gradient(to bottom, #f6f4f4 20%,#e7e5e6 80%);
+}
+
 GtkButton
  {
 	-GtkWidget-focus-line-width: 0;
 	border-width: 1px;
-	
-}
+	}

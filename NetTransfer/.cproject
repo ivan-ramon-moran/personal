@@ -20,7 +20,7 @@
 							<targetPlatform id="cdt.managedbuild.target.gnu.platform.exe.debug.1043529343" name="Debug Platform" superClass="cdt.managedbuild.target.gnu.platform.exe.debug"/>
 							<builder buildPath="${workspace_loc:/NetTransfer}/Debug" id="cdt.managedbuild.target.gnu.builder.exe.debug.1212268550" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="Gnu Make Builder" superClass="cdt.managedbuild.target.gnu.builder.exe.debug"/>
 							<tool id="cdt.managedbuild.tool.gnu.archiver.base.621433365" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.base"/>
-							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.878189248" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug">
+							<tool command="g++ -std=c++11" id="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.878189248" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug">
 								<option id="gnu.cpp.compiler.exe.debug.option.optimization.level.1668433243" name="Optimization Level" superClass="gnu.cpp.compiler.exe.debug.option.optimization.level" value="gnu.cpp.compiler.optimization.level.none" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.exe.debug.option.debugging.level.1141683372" name="Debug Level" superClass="gnu.cpp.compiler.exe.debug.option.debugging.level" value="gnu.cpp.compiler.debugging.level.max" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.other.other.68401459" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" value="-c -fmessage-length=0 -pthread" valueType="string"/>
@@ -55,10 +55,11 @@
 									<listOptionValue builtIn="false" value="/usr/include/at-spi2-atk/2.0"/>
 									<listOptionValue builtIn="false" value="/usr/include/gio-unix-2.0/"/>
 									<listOptionValue builtIn="false" value="/usr/include/harfbuzz"/>
+									<listOptionValue builtIn="false" value="/usr/include/tbb"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.995800637" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
-							<tool id="cdt.managedbuild.tool.gnu.c.compiler.exe.debug.1882581954" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.exe.debug">
+							<tool commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG} ${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" id="cdt.managedbuild.tool.gnu.c.compiler.exe.debug.1882581954" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.exe.debug">
 								<option defaultValue="gnu.c.optimization.level.none" id="gnu.c.compiler.exe.debug.option.optimization.level.452618674" name="Optimization Level" superClass="gnu.c.compiler.exe.debug.option.optimization.level" valueType="enumerated"/>
 								<option id="gnu.c.compiler.exe.debug.option.debugging.level.27704968" name="Debug Level" superClass="gnu.c.compiler.exe.debug.option.debugging.level" value="gnu.c.debugging.level.max" valueType="enumerated"/>
 								<option id="gnu.c.compiler.option.include.paths.674509573" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
@@ -96,7 +97,7 @@
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1003570923" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.c.linker.exe.debug.701304878" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.exe.debug"/>
-							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug.134323078" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug">
+							<tool command="g++" id="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug.134323078" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug">
 								<option id="gnu.cpp.link.option.libs.458064181" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
 									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="gtkmm-3.0"/>
 									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="atkmm-1.6"/>
@@ -117,7 +118,15 @@
 									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="sigc-2.0"/>
 									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="gobject-2.0"/>
 									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="glib-2.0"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="tbb"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="gtkmm-3.0"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="atkmm-1.6"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="gdkmm-3.0"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="giomm-2.4"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="pangomm-1.4"/>
 									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="gtk-3"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="glibmm-2.4"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="cairomm-1.0"/>
 									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="gdk-3"/>
 									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="atk-1.0"/>
 									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="gio-2.0"/>
@@ -126,6 +135,7 @@
 									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="cairo-gobject"/>
 									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="pango-1.0"/>
 									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="cairo"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="sigc-2.0"/>
 									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="gobject-2.0"/>
 									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="glib-2.0"/>
 								</option>
@@ -198,10 +208,11 @@
 						<entry flags="UNDEFINED" kind="libraryFile" name="sigc-2.0" srcPrefixMapping="" srcRootPath=""/>
 						<entry flags="UNDEFINED" kind="libraryFile" name="gobject-2.0" srcPrefixMapping="" srcRootPath=""/>
 						<entry flags="UNDEFINED" kind="libraryFile" name="glib-2.0" srcPrefixMapping="" srcRootPath=""/>
+						<entry flags="UNDEFINED" kind="libraryFile" name="tbb" srcPrefixMapping="" srcRootPath=""/>
 					</externalSetting>
 				</externalSettings>
 			</storageModule>
-			<storageModule CDApplet="false" atk="false" atk-bridge-2.0="false" atkmm-1.6="false" bash-completion="false" bigreqsproto="false" cairo="false" cairo-egl="false" cairo-fc="false" cairo-ft="false" cairo-gl="false" cairo-glx="false" cairo-gobject="false" cairo-pdf="false" cairo-png="false" cairo-ps="false" cairo-script="false" cairo-svg="false" cairo-tee="false" cairo-xcb="false" cairo-xcb-shm="false" cairo-xlib="false" cairo-xlib-xrender="false" cairomm-1.0="false" cairomm-ft-1.0="false" cairomm-pdf-1.0="false" cairomm-png-1.0="false" cairomm-ps-1.0="false" cairomm-svg-1.0="false" cairomm-xlib-1.0="false" cairomm-xlib-xrender-1.0="false" compositeproto="false" damageproto="false" dmxproto="false" dri="false" dri2proto="false" egl="false" evieproto="false" fixesproto="false" fontconfig="false" fontsproto="false" freetype2="false" gail="false" gail-3.0="false" gdk-2.0="false" gdk-3.0="false" gdk-pixbuf-2.0="false" gdk-pixbuf-xlib-2.0="false" gdk-x11-2.0="false" gdk-x11-3.0="false" gdkmm-3.0="false" gio-2.0="false" gio-unix-2.0="false" giomm-2.4="false" gl="false" glib-2.0="false" glibmm-2.4="false" glproto="false" gmodule-2.0="false" gmodule-export-2.0="false" gmodule-no-export-2.0="false" gnome-icon-theme="false" gnome-keybindings="false" gnome-python-desktop-2.0="false" gnome-video-effects="false" gobject-2.0="false" gthread-2.0="false" gtkmm-3.0="true" gtkplus-2.0="false" gtkplus-3.0="true" gtkplus-unix-print-2.0="false" gtkplus-unix-print-3.0="false" gtkplus-x11-2.0="false" gtkplus-x11-3.0="false" harfbuzz="false" ibus-typing-booster="false" inputproto="false" kbproto="false" libbsd="false" libbsd-overlay="false" libdrm="false" libdrm_intel="false" libdrm_nouveau="false" libdrm_radeon="false" libkms="false" libpng="false" libpng15="false" libquvi-scripts="false" moduleId="packages" notify-python="false" pango="false" pangocairo="false" pangoft2="false" pangomm-1.4="false" pangoxft="false" pixman-1="false" pthread-stubs="false" randrproto="false" recordproto="false" renderproto="false" resourceproto="false" scrnsaverproto="false" shared-mime-info="false" sigcplusplus-2.0="false" systemd="false" udev="false" usbutils="false" videoproto="false" x11="false" x11-xcb="false" xau="false" xcb="false" xcb-composite="false" xcb-damage="false" xcb-dpms="false" xcb-dri2="false" xcb-glx="false" xcb-randr="false" xcb-record="false" xcb-render="false" xcb-res="false" xcb-screensaver="false" xcb-shape="false" xcb-shm="false" xcb-sync="false" xcb-xevie="false" xcb-xf86dri="false" xcb-xfixes="false" xcb-xinerama="false" xcb-xkb="false" xcb-xselinux="false" xcb-xtest="false" xcb-xv="false" xcb-xvmc="false" xcmiscproto="false" xcomposite="false" xcursor="false" xdamage="false" xext="false" xextproto="false" xf86bigfontproto="false" xf86dgaproto="false" xf86driproto="false" xf86miscproto="false" xf86vidmodeproto="false" xfixes="false" xft="false" xi="false" xinerama="false" xineramaproto="false" xproto="false" xproxymngproto="false" xrandr="false" xrender="false" xxf86vm="false" zlib="false"/>
+			<storageModule CDApplet="false" atk="false" atk-bridge-2.0="false" atkmm-1.6="false" bash-completion="false" bigreqsproto="false" cairo="false" cairo-egl="false" cairo-fc="false" cairo-ft="false" cairo-gl="false" cairo-glx="false" cairo-gobject="false" cairo-pdf="false" cairo-png="false" cairo-ps="false" cairo-script="false" cairo-svg="false" cairo-tee="false" cairo-xcb="false" cairo-xcb-shm="false" cairo-xlib="false" cairo-xlib-xrender="false" cairomm-1.0="false" cairomm-ft-1.0="false" cairomm-pdf-1.0="false" cairomm-png-1.0="false" cairomm-ps-1.0="false" cairomm-svg-1.0="false" cairomm-xlib-1.0="false" cairomm-xlib-xrender-1.0="false" compositeproto="false" damageproto="false" dmxproto="false" dri="false" dri2proto="false" egl="false" evieproto="false" fixesproto="false" fontconfig="false" fontsproto="false" freetype2="false" gail="false" gail-3.0="false" gdk-2.0="false" gdk-3.0="false" gdk-pixbuf-2.0="false" gdk-pixbuf-xlib-2.0="false" gdk-x11-2.0="false" gdk-x11-3.0="false" gdkmm-3.0="false" gio-2.0="false" gio-unix-2.0="false" giomm-2.4="false" gl="false" glib-2.0="false" glibmm-2.4="false" glproto="false" gmodule-2.0="false" gmodule-export-2.0="false" gmodule-no-export-2.0="false" gnome-icon-theme="false" gnome-keybindings="false" gnome-python-desktop-2.0="false" gnome-video-effects="false" gobject-2.0="false" gthread-2.0="false" gtkmm-3.0="true" gtkplus-2.0="false" gtkplus-3.0="true" gtkplus-unix-print-2.0="false" gtkplus-unix-print-3.0="false" gtkplus-x11-2.0="false" gtkplus-x11-3.0="false" harfbuzz="false" ibus-typing-booster="false" inputproto="false" kbproto="false" libbsd="false" libbsd-overlay="false" libdrm="false" libdrm_intel="false" libdrm_nouveau="false" libdrm_radeon="false" libkms="false" libpng="false" libpng15="false" libquvi-scripts="false" moduleId="packages" notify-python="false" pango="false" pangocairo="false" pangoft2="false" pangomm-1.4="false" pangoxft="false" pixman-1="false" pthread-stubs="false" randrproto="false" recordproto="false" renderproto="false" resourceproto="false" scrnsaverproto="false" shared-mime-info="false" sigcplusplus-2.0="false" systemd="false" tbb="true" tbbmalloc="false" tbbmalloc_proxy="false" udev="false" usbutils="false" videoproto="false" x11="false" x11-xcb="false" xau="false" xcb="false" xcb-composite="false" xcb-damage="false" xcb-dpms="false" xcb-dri2="false" xcb-glx="false" xcb-randr="false" xcb-record="false" xcb-render="false" xcb-res="false" xcb-screensaver="false" xcb-shape="false" xcb-shm="false" xcb-sync="false" xcb-xevie="false" xcb-xf86dri="false" xcb-xfixes="false" xcb-xinerama="false" xcb-xkb="false" xcb-xselinux="false" xcb-xtest="false" xcb-xv="false" xcb-xvmc="false" xcmiscproto="false" xcomposite="false" xcursor="false" xdamage="false" xext="false" xextproto="false" xf86bigfontproto="false" xf86dgaproto="false" xf86driproto="false" xf86miscproto="false" xf86vidmodeproto="false" xfixes="false" xft="false" xi="false" xinerama="false" xineramaproto="false" xproto="false" xproxymngproto="false" xrandr="false" xrender="false" xxf86vm="false" zlib="false"/>
 		</cconfiguration>
 		<cconfiguration id="cdt.managedbuild.config.gnu.exe.release.1244678543">
 			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.config.gnu.exe.release.1244678543" moduleId="org.eclipse.cdt.core.settings" name="Release">
@@ -279,4 +290,5 @@
 			<resource resourceType="PROJECT" workspacePath="/NetTransfer"/>
 		</configuration>
 	</storageModule>
+	<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
 </cproject>

@@ -12,6 +12,7 @@
 #include <gtk/gtk.h>
 #include "Archivo.h"
 #include "Directorio.h"
+#include "UtilidadesTipos.h"
 
 using namespace std;
 
@@ -50,9 +51,6 @@ private:
 	string ObtenerNombreFichero(string path);
 	//Config config;
 	GtkWidget *label_estado;
-
-	void *T_Escuchar(void);
-
 };
 
 #endif /* SERVER_H_ */

@@ -16,11 +16,11 @@
 #include "Server.h"
 #include <pthread.h>
 #include "Cliente.h"
-#include <pthread.h>
 #include "Directorio.h"
 #include "Configuracion.h"
 #include "Mensaje.h"
 #include "Archivo.h"
+#include "DAutentificacion.h"
 
 using namespace std;
 
@@ -52,6 +52,7 @@ void on_conectar_clicked(GtkWidget *widget, InfoConexion* c);
 void *Escuchar(void *threadid);
 bool ValidarConexion(string direccion, string str_puerto);
 void EliminarArchivosOcultos(vector<Archivo> &v_archivos);
+void EnviarDirectorios(string ruta);
 
 int main (int argc, char *argv[])
 {
@@ -99,14 +100,29 @@ int main (int argc, char *argv[])
 	GtkWidget *toolbar_chat;
 	GtkWidget *imagen_chat;
 	GtkWidget *cont_cuerpo;
-	GtkWidget *iz_borrar;
+	GtkWidget *cont_detalles_archivo;
 	GtkWidget *label_servidor;
 	GtkWidget *img_info_barra_estado;
+	GtkWidget *img_preview;
+	GtkWidget *label_eti_nombre;
+	GtkWidget *label_nombre;
+	GtkWidget *cont_nombre;
+	GtkWidget *label_eti_ruta;
+	GtkWidget *label_ruta;
+	GtkWidget *cont_ruta;
+	GtkWidget *label_eti_tipo;
+	GtkWidget *label_tipo;
+	GtkWidget *cont_tipo;
+	GtkWidget *label_eti_tamanyo;
+	GtkWidget *label_tamanyo;
+	GtkWidget *cont_tamanyo;
 
 	gtk_init(&argc, &argv);
 	window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	InfoConexion *info_conexion = new InfoConexion;
 	info_conexion->ventana_principal = window;
+	Configuracion::get_instance()->ventana_principal = window;
+
 	gtk_widget_set_name(GTK_WIDGET(window), "vent_principal");
 	gtk_window_set_default_size(GTK_WINDOW(window),1000, 600);
 	gtk_window_set_title(GTK_WINDOW(window), "NetTransfer - Share your files!!!");
@@ -286,10 +302,56 @@ int main (int argc, char *argv[])
 
 	//Posicionamos el visor de archivo
 	cont_cuerpo = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
-	//BORRAR ESTO CUANDO TENGAMOS CONTENIDO
-	iz_borrar = gtk_event_box_new();
-	gtk_widget_set_size_request(GTK_WIDGET(iz_borrar), 250, 0);
-	gtk_box_pack_start(GTK_BOX(cont_cuerpo),iz_borrar, 0, 0, 0);
+	//---------------------------CONTENEDOR DETALLES DE ARCHIVO-------------------------------------
+	cont_detalles_archivo = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+	gtk_widget_set_size_request(GTK_WIDGET(cont_detalles_archivo), 250, 0);
+	gtk_box_pack_start(GTK_BOX(cont_cuerpo),cont_detalles_archivo, 0, 0, 0);
+
+	//Creamos la imagen del preview del fichero o directorio
+	img_preview = gtk_image_new_from_file("Images/preview/folder.png");
+	//Creamos 2 labels y un contenedor para mostrar el nombre del fichero
+	label_eti_nombre = gtk_label_new("Nombre: ");
+	label_nombre = gtk_label_new("Ubuntu");
+	cont_nombre = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+	//Añadimos los labels
+	gtk_box_pack_start(GTK_BOX(cont_nombre), GTK_WIDGET(label_eti_nombre), 0, 0, 20);
+	gtk_box_pack_start(GTK_BOX(cont_nombre), GTK_WIDGET(label_nombre), 0, 0, 0);
+	//Creamos 2 labels y un contenedor para mostrar la ruta del fichero
+	label_eti_ruta = gtk_label_new("Ruta: ");
+	label_ruta = gtk_label_new("/home/k3rnel/Escritorio");
+	cont_ruta = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+	//Añadimos los labels a su contenedor
+	gtk_box_pack_start(GTK_BOX(cont_ruta), GTK_WIDGET(label_eti_ruta), 0, 0, 20);
+	gtk_box_pack_start(GTK_BOX(cont_ruta), GTK_WIDGET(label_ruta), 0, 0, 20);
+	//Creamos 2 labels para mostrar el tipo de fichero y su contenedor
+	label_eti_tipo = gtk_label_new("Tipo: ");
+	label_tipo = gtk_label_new("inode/directory");
+	cont_tipo = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+	//Añadimos los labels a su contenedor
+	gtk_box_pack_start(GTK_BOX(cont_tipo), GTK_WIDGET(label_eti_tipo), 0, 0, 20);
+	gtk_box_pack_start(GTK_BOX(cont_tipo), GTK_WIDGET(label_tipo), 0, 0, 20);
+	//Creamos 2 labels y su contenedor para mostrar el tamanyo de archivo
+	label_eti_tamanyo = gtk_label_new("Tamaño: ");
+	label_tamanyo = gtk_label_new("12 MB");
+	cont_tamanyo = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+	//Añadimos los labels a su contenedor
+	gtk_box_pack_start(GTK_BOX(cont_tamanyo), GTK_WIDGET(label_eti_tamanyo), 0, 0, 20);
+	gtk_box_pack_start(GTK_BOX(cont_tamanyo), GTK_WIDGET(label_tamanyo), 0, 0, 0);
+
+	//Añadimos todos los componentes graficos a la vista detalle de archivos/directorios
+	gtk_box_pack_start(GTK_BOX(cont_detalles_archivo), GTK_WIDGET(img_preview), 0, 0, 0);
+	gtk_box_pack_start(GTK_BOX(cont_detalles_archivo), GTK_WIDGET(cont_nombre), 0, 0, 10);
+	gtk_box_pack_start(GTK_BOX(cont_detalles_archivo), GTK_WIDGET(cont_ruta), 0, 0, 10);
+	gtk_box_pack_start(GTK_BOX(cont_detalles_archivo), GTK_WIDGET(cont_tipo), 0, 0, 10);
+	gtk_box_pack_start(GTK_BOX(cont_detalles_archivo), GTK_WIDGET(cont_tamanyo), 0, 0, 10);
+
+	//Añadimos todos los componentes a la Configuracoin mediante punteros
+	Configuracion::get_instance()->label_nombre = label_nombre;
+	Configuracion::get_instance()->label_ruta = label_ruta;
+	Configuracion::get_instance()->label_tipo = label_tipo;
+	Configuracion::get_instance()->label_tamanyo = label_tamanyo;
+
+	//----------------------------------------------------------------------------------------------
 
 	//Creamos el visor de archivos
 	FileViewer file_viewer(cont_cuerpo);
@@ -366,8 +428,10 @@ void on_conectar_clicked(GtkWidget *widget, InfoConexion *info)
 				try
 				{
 					if (info->cliente->GetEstado() != "conectado")
+					{
 						info->cliente->Conectar(direccion, puerto);
-
+						DAutentificacion d_aut(Configuracion::get_instance()->ventana_principal);
+					}
 					//data_threads.cliente = info->cliente;
 					Configuracion::get_instance()->cliente = info->cliente;
 				}
@@ -409,67 +473,23 @@ void on_conectar_clicked(GtkWidget *widget, InfoConexion *info)
 void *Escuchar(void *info)
 {
 	string mensaje;
-	vector<string> v_resultados;
-	vector<Archivo> v_archivos;
-	GFile *file;
-	GFileInfo *file_info;
-	GError *error;
-	const char *tipo_archivo;
-
 	Server server(7777);
 	//Pasamos la direccion de memoria del campo estado de la barra de estado, para poder modificar
 	//lo en el servidor.
 	server.SetLabelEstado(GTK_WIDGET(data_threads.label_servidor));
+	Configuracion::get_instance()->server = &server;
 
 	while (1)
 	{
 		//Ponemos el server a escuchar!!!
 		server.Escuchar();
 
-		//Recibimos el mensaje de cliente
-		mensaje = server.RecibirDatos();
-
 		//Realizamos la operacion pertinente
 		while (mensaje != "salir" || server.GetEstadoCliente() != "desconectado")
 		{
-			cout << "El mensaje es: " << mensaje << endl;
-			cout << "Longitud: " << mensaje.length() << endl;
-
-			try
-			{
-				Directorio::ListarDirectorio(mensaje, v_resultados);
-				cout << "gadfsñkhhdscdsgfu" << endl;
-			}
-			catch (exception &e)
-			{
-				cout << "ERROR!!!" << endl;
-			}
-
-			//v_archivos.clear();
-
-			for (unsigned int i = 0; i < v_resultados.size(); i++)
-			{
-				//Obtenemos el mimetype del archivo
-				file = g_file_new_for_path((mensaje + "/" + v_resultados[i]).c_str());
-				file_info = g_file_query_info(file, "standard::*", G_FILE_QUERY_INFO_NONE, NULL, &error);
-				tipo_archivo = g_file_info_get_content_type (file_info);
-				//Creamos un vector de objetos archivo para enviarlo al cliente
-				Archivo archivo(v_resultados[i], mensaje + "/", tipo_archivo, 0);
-				//cout << tipo_archivo << endl;
-				v_archivos.push_back(archivo);
-			}
-
-			//Si en la configuracion esta puesto que no mostremos archivos ocultos los eliminamos del vector
-			if (!Configuracion::get_instance()->mostrar_archivos_ocultos)
-				EliminarArchivosOcultos(v_archivos);
-
-			//Limpiamos el mensaje
-			mensaje.clear();
-			//Enviamos los datos
-			server.SerializarObjeto(v_archivos);
-
-			//Esperamos otra comunicacion del cliente
+			//Recibimos la orden del cliente
 			mensaje = server.RecibirDatos();
+			EnviarDirectorios(mensaje);
 		}
 	}
 
@@ -521,4 +541,49 @@ void EliminarArchivosOcultos(vector<Archivo> &v_archivos)
 			i--;
 		}
 	}
+}
+
+
+void EnviarDirectorios(string ruta)
+{
+	vector<string> v_resultados;
+	vector<Archivo> v_archivos;
+	GFile *file;
+	GFileInfo *file_info;
+	GError *error;
+	const char *tipo_archivo;
+	string str_tipo_archivo;
+	unsigned long long file_size;
+
+	Directorio::ListarDirectorio(ruta, v_resultados);
+
+	for (unsigned int i = 0; i < v_resultados.size(); i++)
+	{
+		file_size = 0;
+		//Obtenemos el mimetype del archivo
+		file = g_file_new_for_path((ruta + "/" + v_resultados[i]).c_str());
+		file_info = g_file_query_info(file, "standard::*", G_FILE_QUERY_INFO_NONE, NULL, &error);
+		tipo_archivo = g_file_info_get_content_type (file_info);
+		str_tipo_archivo = tipo_archivo;
+
+		//Creamos un vector de objetos archivo para enviarlo al cliente
+		if (str_tipo_archivo != "inode/directory")
+		{
+			Directorio::GetFileSize(ruta + "/" + v_resultados[i], file_size);
+			Archivo archivo(v_resultados[i], ruta + "/", tipo_archivo, file_size);
+			v_archivos.push_back(archivo);
+		}
+		else
+		{
+			Archivo archivo(v_resultados[i], ruta + "/", tipo_archivo, 0);
+			v_archivos.push_back(archivo);
+		}
+	}
+
+	//Si en la configuracion esta puesto que no mostremos archivos ocultos los eliminamos del vector
+	if (!Configuracion::get_instance()->mostrar_archivos_ocultos)
+		EliminarArchivosOcultos(v_archivos);
+
+	//Enviamos los datos
+	Configuracion::get_instance()->server->SerializarObjeto(v_archivos);
 }

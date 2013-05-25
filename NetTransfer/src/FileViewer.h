@@ -21,6 +21,7 @@
 using namespace std;
 
 static Pila<string> rutas;
+static string item_seleccionado;
 
 class FileViewer
 {
@@ -36,7 +37,7 @@ public:
 	FileViewer(GtkWidget *contenedor_padre);
 
 	//Operaciones permitidas
-	void set_items(const vector<Archivo> &elementos);
+	void set_items(vector<Archivo> &elementos);
 
 private:
 	//Contenedor donde pondremos el componente
@@ -61,16 +62,18 @@ private:
 	GError *g;
 	GtkWidget *ev_final_visor;
 	GtkWidget *cont_final_visor;
-	//Guardamos una referencia el cliente para poder llamar desde aqui a cualquier metodo del cliente
-
+	GtkTreeIter iter;
 	//Vector que contendra los elementos a pintar en el file_viewer
 	vector<Archivo> elementos;
 	//Funciones auxiliares que el usuario no debe conocer.
-	GtkTreeModel *create_and_fill_model ();
+	GtkTreeModel *create_and_fill_model();
 	void set_num_archivos(int num_archivos);
 
 	//Señales (Cuidado han de ser static)
-	static void on_item_activated (GtkTreeView *view, GtkTreePath *path, GtkTreeViewColumn *col, gpointer userdata);
+	static void on_item_activated (GtkTreeView *view, gpointer userdata);
+	static void on_item_one_click(GtkWidget *icon_view, gpointer userdata);
+
+	static int buscar_item(string item);
 	int ObtenerTipo(string tipo);
 };
 

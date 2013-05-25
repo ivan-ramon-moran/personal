@@ -289,62 +289,40 @@ void Server::Close()
 
 void Server::SerializarObjeto(vector<Archivo> &vector)
 {
-	cout << "Empiezo a serializar" << endl;
-	char *data = new char[1024];
-	ifstream file;
-	struct stat filestatus;
-	unsigned long long tamanyo_fichero, tamanyo_restante;
-	ofstream fich_ser;
-	string ruta_fichero = "sal_objser/arch.bin";
-	char nombre_archivo[] = "arch.bin";
+	char data[1000];
+	string str_num_elementos;
 
-	//Borramos el fichero antiguo
-	//Directorio::BorrarFileDir("sal_objser/arch.bin");
+	int inum_elementos = vector.size();
+	str_num_elementos = UtilidadesTipos::IntToString(inum_elementos);
 
-	//Creamos el fichero
-	//Abrimos el fichero y vamos metiendo los archivos
-	fich_ser.open(ruta_fichero.c_str(), ios::binary);
+	for (unsigned int i = 0; i < str_num_elementos.length(); i++)
+		data[i] = str_num_elementos[i];
+
+	write(client_sock, data, strlen(data));
+	GetReady();
 
 	for (unsigned int i = 0; i < vector.size(); i++)
 	{
-		Archivo arch = vector[i];
-		fich_ser.write((char *)&arch, sizeof(arch));
-	}
-
-	//Cerramos el fichero
-	fich_ser.close();
-
-	//tamanyo del fichero
-	stat(ruta_fichero.c_str() , &filestatus );
-	tamanyo_fichero = filestatus.st_size;
-	tamanyo_restante = tamanyo_fichero;
-
-	//Abrimos el fichero
-	file.open(ruta_fichero.c_str(), ios::binary);
-
-	//Si hemos podido abrir el fichero, empezamos a leerlo y mandarlo
-	if (file)
-	{
-		write(client_sock, nombre_archivo, sizeof(nombre_archivo));
+		//Enviamos el nombre
+		UtilidadesTipos::StringToArray(vector[i].get_nombre(), data);
+		write(client_sock, data, strlen(data));
 		GetReady();
-		//Leemos el archivo y lo enviamos.
-		while (file.read(data, 1024))
-		{
-			write(client_sock, data, 1024);
-			GetReady();
-			tamanyo_restante -= 1024;
-			//GetReady();
-		}
-
-		cout << tamanyo_restante << endl;
-		write(client_sock, data, tamanyo_restante);
+		//Vaciamos el array
+		bzero(data, 1000);
+		//Enviamos la ruta
+		UtilidadesTipos::StringToArray(vector[i].get_ruta(), data);
+		write(client_sock, data, strlen(data));
 		GetReady();
-		cout << "enviado" << endl;
-		file.close();
+		//Vaciamos el array
+		bzero(data, 1000);
+		UtilidadesTipos::StringToArray(vector[i].get_tipo(), data);
+		write(client_sock, data, strlen(data));
+		GetReady();
+		//Vaciamos el array
+		bzero(data, 1000);
+		UtilidadesTipos::LongToArray(vector[i].get_tamanyo(), data);
+		write(client_sock, data, strlen(data));
+		bzero(data, 1000);
+		GetReady();
 	}
-	else
-		cout << "No se ha podido abrir el fichero" << endl;
-
-	cout << "Acabo a serializar" << endl;
-
 }

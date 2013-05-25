@@ -129,59 +129,48 @@ void Cliente::RecibirFichero()
 
 void Cliente::DeserializarObjeto(vector<Archivo> &v_archivos)
 {
-	cout << "Empiezo a deserializar" << endl;
-	ofstream file;
-	ifstream fich_l;
-	char *data = new char[1024];
-	char c_nombre_fichero[100];
-	int num_bytes;
-	Archivo arch;
-	string nombre_fichero, ruta_entrada, ruta_completa;
+	char data[1000];
+	int bytes_leidos;
+	int num_archivos;
+	string nombre_archivo;
+	string ruta;
+	string tipo_archivo;
+	unsigned long long file_size;
 
-	//Recibimos el nombre del fichero
-	num_bytes = recv(sock, c_nombre_fichero, 100, 0);
-	nombre_fichero = Array2String(c_nombre_fichero, num_bytes);
-	cout << "pbags" << nombre_fichero << endl;
+	//Recibimos el tamanyo
+	bytes_leidos = recv(sock, data, 1000,0);
+	num_archivos = UtilidadesTipos::ArrayToInt(data, bytes_leidos);
 	SendReady();
 
-	file.open(("ent_objser/" + nombre_fichero).c_str(), ios::binary);
-
-	if (file)
+	for (int i = 0; i < num_archivos; i++)
 	{
-		num_bytes = recv(sock, data, 1024,0);
+		bytes_leidos = recv(sock, data, 1000, 0);
+		nombre_archivo = UtilidadesTipos::ArrayToString(data, bytes_leidos);
 		SendReady();
-		//Recibimos el archivo
-		while (num_bytes == 1024)
+		bytes_leidos = recv(sock, data, 1000, 0);
+		ruta = UtilidadesTipos::ArrayToString(data, bytes_leidos);
+		SendReady();
+		bytes_leidos = recv(sock, data, 1000, 0);
+		tipo_archivo = UtilidadesTipos::ArrayToString(data, bytes_leidos);
+		SendReady();
+		bytes_leidos = recv(sock, data, 1000, 0);
+		file_size = UtilidadesTipos::ArrayToLong(data, bytes_leidos);
+		SendReady();
+
+		if (tipo_archivo != "inode/directory")
 		{
-			file.write(data, num_bytes);
-			num_bytes = recv(sock, data, 1024,0);
-			SendReady();
+			Archivo archivo(nombre_archivo, ruta, tipo_archivo, file_size);
+			cout << archivo.get_tamanyo() << endl;
+			v_archivos.push_back(archivo);
+		}
+		else
+		{
+			Archivo archivo(nombre_archivo, ruta, tipo_archivo, 0);
+			v_archivos.push_back(archivo);
 		}
 
-		file.write(data, num_bytes);
-
-		cout << "Recibido" << endl;
-
-		file.close();
 	}
-	else
-		cout << "No se ha podido abrir el fichero" << endl;
-
-	fich_l.open(("ent_objser/" + nombre_fichero).c_str(), ios::binary);
-
-	if (fich_l)
-	{
-		while (fich_l.read((char *)&arch, sizeof(Archivo)))
-		{
-			cout << arch.get_nombre() << endl;
-			v_archivos.push_back(arch);
-		}
-
-		fich_l.close();
-	}
-
-	delete data;
-	cout << "Acabo de deserializar" << endl;
+	cout << "Ya he salido de aqui machote" << endl;
 }
 
 void Cliente::EnviarArchivo(string path)

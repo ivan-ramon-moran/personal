@@ -10,6 +10,7 @@
 #include "ExcepcionPersonalizada.h"
 #include "Archivo.h"
 #include "Directorio.h"
+#include "UtilidadesTipos.h"
 
 using namespace std;
 

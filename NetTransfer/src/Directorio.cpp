@@ -82,13 +82,32 @@ void Directorio::ListarDirectorio(string &path, vector<string> &vector)
 	while ((direntPtr = readdir(directorioPtr)) != NULL)
 	{
 		string dir = direntPtr->d_name;
-		//ñadimos el directorio/fichero al vector
 		if (dir != "")
+			//Añadimos el directorio/fichero al vector
 			vector.push_back(dir);
-
-		cout << direntPtr->d_name << endl;
-		cout << "Añadido" << endl;
 	}
 
 	closedir(directorioPtr);
+}
+
+bool Directorio::GetFileSize(string path, unsigned long long &file_size)
+{
+	ifstream file;
+	bool ok = false;
+
+	file.open(path.c_str());
+
+	if (file)
+	{
+		//Posicinamos la ventana del archivo al final
+		file.seekg(0, file.end);
+		//Obtenemos el tamanyo del archivo
+		file_size = file.tellg();
+		//Volvemos a apuntar la ventana del archivo al principio
+		file.seekg(0, file.beg);
+
+		file.close();
+	}
+
+	return ok;
 }

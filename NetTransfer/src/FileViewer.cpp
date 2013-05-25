@@ -107,131 +107,159 @@ FileViewer::FileViewer(GtkWidget *contenedor_padre)
 
 	//Señales
 	g_signal_connect(G_OBJECT(file_viewer), "item-activated", G_CALLBACK(on_item_activated), NULL);
+	//g_signal_connect(G_OBJECT(file_viewer), "selection-changed", G_CALLBACK(on_item_one_click), NULL);
+
 }
 
 GtkTreeModel* FileViewer::create_and_fill_model ()
 {
-  GtkListStore *list_store;
-  GdkPixbuf *img_folder, *img_text, *img_zip, *img_pdf, *img_png, *img_mp3, *img_jpg, *img_app;
-  GdkPixbuf *img_rar, *img_word, *img_odt, *img_gz;
-  GtkTreeIter iter;
-  GError *err = NULL;
-  stringstream s;
-  int tipo = 0;
+	GtkListStore *list_store;
+	GdkPixbuf *img_folder, *img_text, *img_zip, *img_pdf, *img_png, *img_mp3, *img_jpg, *img_app;
+	GdkPixbuf *img_rar, *img_word, *img_odt, *img_gz;
+	GtkTreeIter iter;
+	GError *err = NULL;
+	stringstream s;
+	int tipo = 0;
 
-  list_store = gtk_list_store_new (NUM_COLS, G_TYPE_STRING, GDK_TYPE_PIXBUF);
+	list_store = gtk_list_store_new (NUM_COLS, G_TYPE_STRING, GDK_TYPE_PIXBUF);
 
-  for (unsigned int i = 0; i < elementos.size(); i++)
-  {
-      tipo = ObtenerTipo(elementos.at(i).get_tipo());
-	  gtk_list_store_append (list_store, &iter);
+	for (unsigned int i = 0; i < elementos.size(); i++)
+	{
+		cout << elementos[i].get_nombre() << endl;
+		tipo = ObtenerTipo(elementos.at(i).get_tipo());
+		cout << "2" << endl;
+		gtk_list_store_append (list_store, &iter);
 
-
-	  //Añadimos los items
-	  switch (tipo)
-	  {
-	  	  case 0:
-	  		  img_folder = gdk_pixbuf_new_from_file ("Images/folder.png", &err);
-	  		  gtk_list_store_set (list_store, &iter, COL_DISPLAY_NAME, elementos.at(i).get_nombre().c_str(), COL_PIXBUF, img_folder, -1);
-	  		  break;
-	  	  case 1:
-	  		  img_text = gdk_pixbuf_new_from_file ("Images/text-plain.png", &err);
-	  		  gtk_list_store_set (list_store, &iter, COL_DISPLAY_NAME, elementos.at(i).get_nombre().c_str(), COL_PIXBUF, img_text, -1);
-	  		  break;
-	  	  case 2:
-	  		  img_pdf = gdk_pixbuf_new_from_file("Images/application-pdf.png", &err);
-	  		  gtk_list_store_set (list_store, &iter, COL_DISPLAY_NAME, elementos.at(i).get_nombre().c_str(), COL_PIXBUF, img_pdf, -1);
-	  		  break;
-	  	  case 3:
-	  		  img_png = gdk_pixbuf_new_from_file("Images/image-png.png", &err);
-	  		  gtk_list_store_set (list_store, &iter, COL_DISPLAY_NAME, elementos.at(i).get_nombre().c_str(), COL_PIXBUF, img_png, -1);
-	  		  break;
-	  	  case 4:
-	  		  img_zip = gdk_pixbuf_new_from_file ("Images/application-x-zip.png", &err);
-	  		  gtk_list_store_set (list_store, &iter, COL_DISPLAY_NAME, elementos.at(i).get_nombre().c_str(), COL_PIXBUF, img_zip, -1);
-	  		  break;
-	  	  case 5:
-	  		  img_mp3 = gdk_pixbuf_new_from_file("Images/audio-x-mpeg.png", &err);
-	  		  gtk_list_store_set (list_store, &iter, COL_DISPLAY_NAME, elementos.at(i).get_nombre().c_str(), COL_PIXBUF, img_mp3, -1);
-	  		  break;
-	  	  case 6:
-	  		  img_jpg = gdk_pixbuf_new_from_file("Images/image-jpeg.png", &err);
-	  		  gtk_list_store_set (list_store, &iter, COL_DISPLAY_NAME, elementos.at(i).get_nombre().c_str(), COL_PIXBUF, img_jpg, -1);
-	  		  break;
-	  	  case 7:
-	  		  img_app = gdk_pixbuf_new_from_file("Images/application-x-executable.png", &err);
+		//Añadimos los items
+		switch (tipo)
+		{
+		  case 0:
+			  img_folder = gdk_pixbuf_new_from_file ("Images/folder.png", &err);
+			  gtk_list_store_set (list_store, &iter, COL_DISPLAY_NAME, elementos.at(i).get_nombre().c_str(), COL_PIXBUF, img_folder, -1);
+			  break;
+		  case 1:
+			  img_text = gdk_pixbuf_new_from_file ("Images/text-plain.png", &err);
+			  gtk_list_store_set (list_store, &iter, COL_DISPLAY_NAME, elementos.at(i).get_nombre().c_str(), COL_PIXBUF, img_text, -1);
+			  break;
+		  case 2:
+			  img_pdf = gdk_pixbuf_new_from_file("Images/application-pdf.png", &err);
+			  gtk_list_store_set (list_store, &iter, COL_DISPLAY_NAME, elementos.at(i).get_nombre().c_str(), COL_PIXBUF, img_pdf, -1);
+			  break;
+		  case 3:
+			  img_png = gdk_pixbuf_new_from_file("Images/image-png.png", &err);
+			  gtk_list_store_set (list_store, &iter, COL_DISPLAY_NAME, elementos.at(i).get_nombre().c_str(), COL_PIXBUF, img_png, -1);
+			  break;
+		  case 4:
+			  img_zip = gdk_pixbuf_new_from_file ("Images/application-x-zip.png", &err);
+			  gtk_list_store_set (list_store, &iter, COL_DISPLAY_NAME, elementos.at(i).get_nombre().c_str(), COL_PIXBUF, img_zip, -1);
+			  break;
+		  case 5:
+			  img_mp3 = gdk_pixbuf_new_from_file("Images/audio-x-mpeg.png", &err);
+			  gtk_list_store_set (list_store, &iter, COL_DISPLAY_NAME, elementos.at(i).get_nombre().c_str(), COL_PIXBUF, img_mp3, -1);
+			  break;
+		  case 6:
+			  img_jpg = gdk_pixbuf_new_from_file("Images/image-jpeg.png", &err);
+			  gtk_list_store_set (list_store, &iter, COL_DISPLAY_NAME, elementos.at(i).get_nombre().c_str(), COL_PIXBUF, img_jpg, -1);
+			  break;
+		  case 7:
+			  img_app = gdk_pixbuf_new_from_file("Images/application-x-executable.png", &err);
 			  gtk_list_store_set (list_store, &iter, COL_DISPLAY_NAME, elementos.at(i).get_nombre().c_str(), COL_PIXBUF, img_app, -1);
 			  break;
-	  	  case 8:
-	  		  img_rar = gdk_pixbuf_new_from_file("Images/application-x-rar.png", &err);
-	  		  gtk_list_store_set (list_store, &iter, COL_DISPLAY_NAME, elementos.at(i).get_nombre().c_str(), COL_PIXBUF, img_rar, -1);
-	  		  break;
-	  	  case 9:
-	  		  img_word = gdk_pixbuf_new_from_file("Images/application-msword.png", &err);
-	  		  gtk_list_store_set (list_store, &iter, COL_DISPLAY_NAME, elementos.at(i).get_nombre().c_str(), COL_PIXBUF, img_word, -1);
-	  		  break;
-	  	  case 10:
-	  		  img_odt = gdk_pixbuf_new_from_file("Images/x-office-document.png", &err);
-	  		  gtk_list_store_set (list_store, &iter, COL_DISPLAY_NAME, elementos.at(i).get_nombre().c_str(), COL_PIXBUF, img_odt, -1);
-	  		  break;
-	  	  case 11:
-	  		  img_gz = gdk_pixbuf_new_from_file("Images/application-x-gzip.png", &err);
-	  		  gtk_list_store_set (list_store, &iter, COL_DISPLAY_NAME, elementos.at(i).get_nombre().c_str(), COL_PIXBUF, img_gz, -1);
-	  		  break;
-	  }
+		  case 8:
+			  img_rar = gdk_pixbuf_new_from_file("Images/application-x-rar.png", &err);
+			  gtk_list_store_set (list_store, &iter, COL_DISPLAY_NAME, elementos.at(i).get_nombre().c_str(), COL_PIXBUF, img_rar, -1);
+			  break;
+		  case 9:
+			  img_word = gdk_pixbuf_new_from_file("Images/application-msword.png", &err);
+			  gtk_list_store_set (list_store, &iter, COL_DISPLAY_NAME, elementos.at(i).get_nombre().c_str(), COL_PIXBUF, img_word, -1);
+			  break;
+		  case 10:
+			  img_odt = gdk_pixbuf_new_from_file("Images/x-office-document.png", &err);
+			  gtk_list_store_set (list_store, &iter, COL_DISPLAY_NAME, elementos.at(i).get_nombre().c_str(), COL_PIXBUF, img_odt, -1);
+			  break;
+		  case 11:
+			  img_gz = gdk_pixbuf_new_from_file("Images/application-x-gzip.png", &err);
+			  gtk_list_store_set (list_store, &iter, COL_DISPLAY_NAME, elementos.at(i).get_nombre().c_str(), COL_PIXBUF, img_gz, -1);
+			  break;
+		}
+	}
 
-  }
+	gtk_label_set_text(GTK_LABEL(label_num_archivos), ("Total: " + s.str() + " Archivos").c_str());
 
-  s << elementos.size();
-  gtk_label_set_text(GTK_LABEL(label_num_archivos), ("Total: " + s.str() + " Archivos").c_str());
-
-  return GTK_TREE_MODEL (list_store);
+    return GTK_TREE_MODEL (list_store);
 }
 
-void FileViewer::on_item_activated (GtkTreeView *view, GtkTreePath *path, GtkTreeViewColumn *col, gpointer userdata)
+void FileViewer::on_item_activated (GtkTreeView *view, gpointer userdata)
 {
-	GtkTreeIter   iter;
-	GtkTreeModel *model;
-	string item, ultima_ruta, ruta;
 	vector<Archivo> v_resultados;
+	string ruta, ultima_ruta;
+	GtkTreeIter iter;
+	GtkTreeModel *model;
+	GList *lista;
+
+	model = gtk_icon_view_get_model(GTK_ICON_VIEW(view));
+	lista = gtk_icon_view_get_selected_items(GTK_ICON_VIEW(view));
 
 	if (Configuracion::get_instance()->cliente->GetEstado() == "conectado")
 	{
-		model = gtk_icon_view_get_model(GTK_ICON_VIEW(view));
-
-		if (gtk_tree_model_get_iter(model, &iter, path))
+		if (gtk_tree_model_get_iter(model, &iter, (GtkTreePath *)lista->data))
 		{
-			gchar *name;
-			gtk_tree_model_get(model, &iter, COL_DISPLAY_NAME, &name, -1);
-			g_print ("The row containing the name '%s' has been double-clicked.\n", name);
-			//Convertimos el gchar a string para poder trabajar de forma mas comoda.
-			item =  UtilidadesTipos::ArrayToString(name);
+			gchar *item;
+			//Obtenemos el item seleccionado
+			gtk_tree_model_get(model, &iter, COL_DISPLAY_NAME, &item, -1);
 			rutas.ObtenerValor(ultima_ruta);
 			rutas.Apilar(ultima_ruta + item + "/");
 			//Tenemos que comprobar si el cliente esta conectado
 			//Obtenemos la ruta correspoendiente
 			rutas.ObtenerValor(ruta);
-			cout << ruta << endl;
-			cout << "Aqui llego chaval0" << endl;
 			Configuracion::get_instance()->cliente->EnviarDatos(ruta);
-			cout << "Aqui llego chaval1" << endl;
 			//Recibimos los resultados
 			Configuracion::get_instance()->cliente->DeserializarObjeto(v_resultados);
-			cout << "Aqui llego chaval2" << endl;
 			cout << v_resultados[0].get_nombre() << endl;
 			//Los seteamos en el file_viewer
 			Configuracion::get_instance()->file_viewer->set_items(v_resultados);
+			g_free(item);
 		}
 	}
 	else
 		cout << "No estas conectado a ningun servidor." << endl;
 
+	cout << "Item: " << item_seleccionado << endl;
 }
 
-void FileViewer::set_items(const vector<Archivo> &elementos)
+void FileViewer::on_item_one_click(GtkWidget *icon_view, gpointer userdata)
 {
-	this->elementos = elementos;
+	GtkTreeIter iter;
+	GtkTreeModel *model;
+	GList *lista;
+	int posicion_item;
 
+	model = gtk_icon_view_get_model(GTK_ICON_VIEW(icon_view));
+	lista = gtk_icon_view_get_selected_items(GTK_ICON_VIEW(icon_view));
+
+	if (gtk_tree_model_get_iter(model, &iter, (GtkTreePath *)lista->data))
+	{
+		gchar *item;
+		//Obtenemos el item seleccionado
+		gtk_tree_model_get(model, &iter, COL_DISPLAY_NAME, &item, -1);
+		//Buscamos el item en el vector de archivos
+		posicion_item = buscar_item(item);
+		item_seleccionado = item;
+		cout << "Item:" << item_seleccionado << endl;
+		//Extraemos el archivo y seteamos los valores en el visor de archivos
+		Archivo arch = Configuracion::get_instance()->elementos.at(posicion_item);
+		gtk_label_set_text(GTK_LABEL(Configuracion::get_instance()->label_nombre), arch.get_nombre().c_str());
+		gtk_label_set_text(GTK_LABEL(Configuracion::get_instance()->label_ruta), arch.get_ruta().c_str());
+		gtk_label_set_text(GTK_LABEL(Configuracion::get_instance()->label_tipo), arch.get_tipo().c_str());
+		gtk_label_set_text(GTK_LABEL(Configuracion::get_instance()->label_tamanyo), (UtilidadesTipos::LongToString(arch.get_tamanyo()) + " Bytes").c_str());
+		g_free(item);
+	}
+}
+
+void FileViewer::set_items(vector<Archivo> &vector_archivos)
+{
+	this->elementos = vector_archivos;
+	Configuracion::get_instance()->elementos = vector_archivos;
 	gtk_icon_view_set_model(GTK_ICON_VIEW(file_viewer), create_and_fill_model());
 }
 
@@ -278,3 +306,17 @@ int FileViewer::ObtenerTipo(string tipo)
 	return resultado;
 }
 
+int FileViewer::buscar_item(string item)
+{
+	int posicion = 0;
+
+	for (unsigned int i = 0; i < Configuracion::get_instance()->elementos.size(); i++)
+	{
+		Archivo arch = Configuracion::get_instance()->elementos.at(i);
+
+		if (arch.get_nombre() == item)
+			posicion = i;
+	}
+
+	return posicion;
+}
