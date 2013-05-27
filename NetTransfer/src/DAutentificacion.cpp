@@ -74,7 +74,7 @@ DAutentificacion::~DAutentificacion() {
 void DAutentificacion::on_boton_aceptar_clicked()
 {
 	Configuracion::get_instance()->usuario = gtk_entry_get_text(GTK_ENTRY(Configuracion::get_instance()->entry_usuario));
-	Configuracion::get_instance()->password = gtk_entry_get_text(GTK_ENTRY(Configuracion::get_instance()->entry_usuario));
+	Configuracion::get_instance()->password = gtk_entry_get_text(GTK_ENTRY(Configuracion::get_instance()->entry_password));
 	gtk_widget_hide(GTK_WIDGET(Configuracion::get_instance()->ventana_aut));
 }
 

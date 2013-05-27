@@ -131,32 +131,99 @@
 
 #boton_aceptar_aut
 {
-	background: linear-gradient(to bottom, #e2e4e5 20%,#c4c7c9 80%);
-	box-shadow: 0 0 1px 1px #b8babc;
-	border-radius: 7px;
+	background: linear-gradient(to bottom, #d7d5d5 20%,#b0adad 100%);
+	box-shadow: 0 0 1px 1px #b3afaf;
+	border-radius: 8px;
 }
 
 #boton_aceptar_aut:active
 {
 	background: #e1e2e3;
-	border-radius: 7px;
 }
 
 #boton_cancelar_aut
 {
-	background: linear-gradient(to bottom, #e2e4e5 20%,#c4c7c9 80%);
-	box-shadow: 0 0 1px 1px #b8babc;
-	border-radius: 7px;
+	background: linear-gradient(to bottom, #d7d5d5 20%,#b0adad 100%);
+	box-shadow: 0 0 1px 1px #b3afaf;
+	border-radius: 8px;
 }
 
 #boton_cancelar_aut:active
 {
 	background: #e1e2e3;
-	border-radius: 7px;
+}
+
+#combo_servidores
+{
+	background:red;
 }
 
 GtkButton
  {
 	-GtkWidget-focus-line-width: 0;
 	border-width: 1px;
+}
+
+#ventana_nuevo_usuario
+{
+	background: linear-gradient(to bottom, #f6f4f4 20%,#e7e5e6 80%);
+}
+
+#entry_nuevo_usuario_nombre
+{
+	border-radius: 15px;
+	background: transparent;
+}
+
+#entry_nuevo_usuario_nombre:focus
+{
+	background: white;
+}
+
+#entry_nuevo_usuario_pass
+{
+	border-radius: 15px;	
+	background: transparent;
+}
+
+#entry_nuevo_usuario_pass:focus
+{
+	background: white;
+}
+
+#boton_nuevo_usuario_cancelar
+{
+	background: linear-gradient(to bottom, #edeaea 10%,#c2c0c0 100%);
+	-GtkWidget-focus-line-width: 0;
+}
+
+#boton_nuevo_usuario_cancelar:active
+{
+	background: #f4f2f2;
+}
+
+#boton_nuevo_usuario_anyadir
+{
+	background-image: linear-gradient(to bottom, #edeaea 10%,#c2c0c0 100%);
+	-GtkWidget-focus-line-width: 0;
+}
+
+#boton_nuevo_usuario_anyadir:active
+{
+	background: #f4f2f2;	
+}
+
+GtkEntry
+{
+	border-radius: 15px;
+}
+
+#entry_directorio
+{
+	background: transparent;
+}
+
+#entry_directorio:focus
+{
+	background: white;
 }

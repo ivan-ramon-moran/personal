@@ -38,6 +38,7 @@ public:
 
 	//Operaciones permitidas
 	void set_items(vector<Archivo> &elementos);
+	void eliminar_elementos();
 
 private:
 	//Contenedor donde pondremos el componente
@@ -68,7 +69,6 @@ private:
 	//Funciones auxiliares que el usuario no debe conocer.
 	GtkTreeModel *create_and_fill_model();
 	void set_num_archivos(int num_archivos);
-
 	//Señales (Cuidado han de ser static)
 	static void on_item_activated (GtkTreeView *view, gpointer userdata);
 	static void on_item_one_click(GtkWidget *icon_view, gpointer userdata);

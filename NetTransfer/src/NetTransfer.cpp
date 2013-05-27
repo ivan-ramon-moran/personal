@@ -22,6 +22,9 @@
 #include "Archivo.h"
 #include "DAutentificacion.h"
 #include <thread>
+#include <sqlite3.h>
+#include "VentanaNuevoUsuario.h"
+#include "BD.h"
 
 using namespace std;
 
@@ -31,6 +34,8 @@ void ThreadEscuchar();
 bool ValidarConexion(string direccion, string str_puerto);
 void EliminarArchivosOcultos(vector<Archivo> &v_archivos);
 void EnviarDirectorios(string ruta);
+void CargarBaseDeDatos();
+void MostrarVentanaNuevoUsuario();
 
 int main (int argc, char *argv[])
 {
@@ -64,6 +69,9 @@ int main (int argc, char *argv[])
 	GtkWidget *menu_ayuda;
 	GtkWidget *ayuda;
 	GtkWidget *acerca_de;
+	GtkWidget *menu_servidor;
+	GtkWidget *servidor;
+	GtkWidget *agregar_usuario;
 	//Entry de conexion
 	GtkWidget *entry_dir;
 	GtkWidget *entry_puerto;
@@ -95,6 +103,7 @@ int main (int argc, char *argv[])
 	GtkWidget *label_tamanyo;
 	GtkWidget *cont_tamanyo;
 
+	CargarBaseDeDatos();
 	gtk_init(&argc, &argv);
 	window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	Configuracion::get_instance()->ventana_principal = window;
@@ -131,6 +140,7 @@ int main (int argc, char *argv[])
 	menu_archivo = gtk_menu_new();
 	menu_editar = gtk_menu_new();
 	menu_ayuda = gtk_menu_new();
+	menu_servidor = gtk_menu_new();
 
 	//Menu archivo
 	archivo = gtk_menu_item_new_with_label("Archivo");
@@ -145,6 +155,10 @@ int main (int argc, char *argv[])
 	ayuda = gtk_menu_item_new_with_label("Ayuda");
 	acerca_de = gtk_menu_item_new_with_label("Acerca de...");
 
+	//Menu servidor
+	servidor = gtk_menu_item_new_with_label("Servidor");
+	agregar_usuario = gtk_menu_item_new_with_label("Crear usuario");
+
 	//Anyadimos el menu archivo
 	gtk_menu_item_set_submenu(GTK_MENU_ITEM(archivo), menu_archivo);
 	gtk_menu_shell_append(GTK_MENU_SHELL(menu_archivo), conectar);
@@ -155,6 +169,12 @@ int main (int argc, char *argv[])
 	gtk_menu_item_set_submenu(GTK_MENU_ITEM(editar), menu_editar);
 	gtk_menu_shell_append(GTK_MENU_SHELL(menu_editar), preferencias);
 	gtk_menu_shell_append(GTK_MENU_SHELL(menubar), editar);
+
+	//Menu servidor
+	gtk_menu_item_set_submenu(GTK_MENU_ITEM(servidor), menu_servidor);
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu_servidor), agregar_usuario);
+	//gtk_menu_shell_append(GTK_MENU_SHELL(menu_archivo), salir);
+	gtk_menu_shell_append(GTK_MENU_SHELL(menubar), servidor);
 
 	//Anyadimos el menu ayuda
 	gtk_menu_item_set_submenu(GTK_MENU_ITEM(ayuda), menu_ayuda);
@@ -240,6 +260,7 @@ int main (int argc, char *argv[])
 
 	label_con_rapidas = gtk_label_new("Conexiones rápidas: ");
 	combo_servidores = gtk_combo_box_text_new();
+	gtk_widget_set_name(GTK_WIDGET(combo_servidores), "combo_servidores");
 	gtk_widget_set_size_request(GTK_WIDGET(combo_servidores), 150, 25);
 	gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(combo_servidores),"Casa", "Casa");
 	gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(combo_servidores),"Oficina", "Oficina");
@@ -274,6 +295,7 @@ int main (int argc, char *argv[])
 	g_signal_connect (window, "destroy", G_CALLBACK (gtk_main_quit), NULL);
 	g_signal_connect(G_OBJECT(salir), "activate", G_CALLBACK(gtk_main_quit), NULL);
 	g_signal_connect(G_OBJECT(acerca_de), "activate", G_CALLBACK(AcercaDe), NULL);
+	g_signal_connect(G_OBJECT(agregar_usuario), "activate", G_CALLBACK(MostrarVentanaNuevoUsuario), NULL);
 	//g_signal_connect(G_OBJECT(toolbar_conectar), "clicked", G_CALLBACK(on_conectar_clicked), file_viewer);
 
 	//Posicionamos el visor de archivo
@@ -414,7 +436,7 @@ void on_conectar_clicked()
 							Configuracion::get_instance()->cliente->EnviarDatos(Configuracion::get_instance()->password);
 							estado_autentificacion = Configuracion::get_instance()->cliente->RecibirDatos();
 
-							if (estado_autentificacion == "ok")
+							if (estado_autentificacion == "AUT")
 							{
 								//Cambiamos el boton de conectar, a desconectar
 								gtk_button_set_image(GTK_BUTTON(Configuracion::get_instance()->boton_conectar), img_desconectar);
@@ -427,8 +449,12 @@ void on_conectar_clicked()
 								Configuracion::get_instance()->file_viewer->set_items(v_resultados);
 							}
 							else
+							{
 								//Mostramos un mensaje de error indicando fallo en la autentificacion.
-								Mensaje mensaje("Error de autentificación", "No se ha podido auntentificar el cliente", Configuracion::get_instance()->ventana_principal);
+								Mensaje mensaje("Error de autentificación", "No existe el usuario en la base de datos del servidor.", Configuracion::get_instance()->ventana_principal);
+								Configuracion::get_instance()->estado = 1;
+								Configuracion::get_instance()->cliente->Cerrar();
+							}
 						}
 					}
 				}
@@ -447,18 +473,21 @@ void on_conectar_clicked()
 	{
 		//Si estamos conectados y le damos al boton de desconectar, desconectamos al cliente.
 		Configuracion::get_instance()->cliente->Cerrar();
-		//Volvemos a cambiar el boton de desconectar a desconectar
+		//Volvemos a cambiar el boton de conectar a desconectar
 		gtk_button_set_image(GTK_BUTTON(Configuracion::get_instance()->boton_conectar), img_conectar);
 		gtk_button_set_label(GTK_BUTTON(Configuracion::get_instance()->boton_conectar), "Conectar");
-		//Ponemos el estado a 1(Desconectato)
+		//Ponemos el estado a 1(Desconectado)
 		Configuracion::get_instance()->estado = 1;
+		//Borramos los items del visor de archivos
+		Configuracion::get_instance()->file_viewer->eliminar_elementos();
 	}
 }
 
 
 void ThreadEscuchar()
 {
-	string mensaje, usuario, password;
+	string mensaje, usuario, password, sentencia;
+	bool autentificado;
 	Server server(7777);
 	//Pasamos la direccion de memoria del campo estado de la barra de estado, para poder modificar
 	//lo en el servidor.
@@ -472,14 +501,24 @@ void ThreadEscuchar()
 		//Autentificación por parte del usuario
 		usuario = server.RecibirDatos();
 		password = server.RecibirDatos();
-		server.EnviarDatos("ok");
+		//Comprobamos en la base de datos si existe el usuario
+		sentencia = "SELECT * FROM usuarios WHERE usuario LIKE '"  + usuario + "' AND password LIKE '" + password + "'";
+		autentificado = BD::ComprobarConsulta("NetTransfer.db", sentencia);
 
+		if (autentificado)
+			server.EnviarDatos("AUT");
+		else
+		{
+			server.EnviarDatos("NO_AUT");
+			mensaje = "salir";
+		}
 		//Realizamos la operacion pertinente
 		while (mensaje != "salir" || server.GetEstadoCliente() != "desconectado")
 		{
 			//Recibimos la orden del cliente
 			mensaje = server.RecibirDatos();
-			EnviarDirectorios(mensaje);
+			if (mensaje != "salir")
+				EnviarDirectorios(mensaje);
 		}
 	}
 }
@@ -576,4 +615,34 @@ void EnviarDirectorios(string ruta)
 
 	//Enviamos los datos
 	Configuracion::get_instance()->server->SerializarObjeto(v_archivos);
+}
+
+void CargarBaseDeDatos()
+{
+	sqlite3 *db;
+	char *error;
+	string sentencia;
+	int res_ope;
+
+	res_ope = sqlite3_open("NetTransfer.db", &db);
+	sentencia = "CREATE TABLE usuarios (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, usuario TEXT NOT NULL, password TEXT NOT NULL)";
+	res_ope = sqlite3_exec(db, sentencia.c_str(), NULL, NULL, &error);
+	sentencia = "CREATE TABLE permisos (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, id_usuario INTEGER NOT NULL, directorio TEXT NOT NULL, lectura INTEGER NOT NULL, escritura INTEGER NOT NULL, FOREIGN KEY(id_usuario) REFERENCES usuarios(id))";
+	res_ope = sqlite3_exec(db, sentencia.c_str(), NULL, NULL, &error);
+
+	if (res_ope == SQLITE_OK)
+			cout << "Operacion realizada" << endl;
+
+	sentencia = "INSERT INTO usuarios (id, usuario, password) VALUES ('1', 'k3rnel', 'admin')";
+	res_ope = sqlite3_exec(db, sentencia.c_str(), NULL, NULL, &error);
+
+	if (res_ope == SQLITE_OK)
+		cout << "Operacion realizada" << endl;
+
+	sqlite3_close(db);
+}
+
+void MostrarVentanaNuevoUsuario()
+{
+	VentanaNuevoUsuario ventana(Configuracion::get_instance()->ventana_principal);
 }

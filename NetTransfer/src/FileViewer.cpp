@@ -315,3 +315,20 @@ int FileViewer::buscar_item(string item)
 
 	return posicion;
 }
+
+void FileViewer::eliminar_elementos()
+{
+	GtkListStore *store;
+	GtkTreeModel *model;
+	GtkTreeIter  iter;
+
+	store = GTK_LIST_STORE(gtk_icon_view_get_model(GTK_ICON_VIEW (file_viewer)));
+	model = gtk_icon_view_get_model (GTK_ICON_VIEW (file_viewer));
+
+	if (gtk_tree_model_get_iter_first(model, &iter) == FALSE)
+		return;
+
+	gtk_list_store_clear(store);
+	rutas.Vaciar();
+	rutas.Apilar("/");
+}

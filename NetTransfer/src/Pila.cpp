@@ -155,6 +155,18 @@ public:
 		}
 	}
 
+	void Vaciar()
+	{
+		Nodo *aux_cima = cima;
+
+		while (cima != NULL)
+		{
+			aux_cima = cima;
+			cima = cima->sig;
+			delete aux_cima;
+		}
+	}
+
 private:
 	//Puntero de tipo nodo que apunta hacia la cima de la pila.
 	Nodo *cima;

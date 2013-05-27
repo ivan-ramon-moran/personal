@@ -325,3 +325,8 @@ void Server::SerializarObjeto(vector<Archivo> &vector)
 		GetReady();
 	}
 }
+
+void Server::DesconectarCliente()
+{
+	shutdown(client_sock, 2);
+}

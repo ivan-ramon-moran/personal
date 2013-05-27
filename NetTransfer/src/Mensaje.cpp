@@ -36,6 +36,8 @@ Mensaje::Mensaje(string titulo, string mensaje, GtkWidget *ventana_padre)
 	g_signal_connect(G_OBJECT(boton_cerrar), "clicked", cerrar_ventana, NULL);
 
 	gtk_widget_show_all(ventana);
+
+	gtk_dialog_run(GTK_DIALOG(ventana));
 }
 
 void cerrar_ventana()

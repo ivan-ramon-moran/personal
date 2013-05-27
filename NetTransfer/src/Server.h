@@ -39,6 +39,7 @@ public:
 	string GetEstado();
 	void SetLabelEstado(GtkWidget *label);
 	void SerializarObjeto(vector<Archivo> &vector);
+	void DesconectarCliente();
 
 private:
 	int socket_desc, client_sock , c , read_size;
