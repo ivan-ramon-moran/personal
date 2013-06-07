@@ -151,6 +151,10 @@ void AnyadirPermiso(GtkWidget *widget, gpointer lista)
 	bool permiso_l = false, permiso_e = false;
 	string contenido_entry_direccion;
 
+	//Limpiamos los permisos de los vectores que utilizaremos para guardar los datos en la base de datos
+	Configuracion::get_instance()->permisos_escritura.clear();
+	Configuracion::get_instance()->permisos_lectura.clear();
+	//Obtenemos la ruta del permiso a anyadir
 	contenido_entry_direccion = gtk_entry_get_text(GTK_ENTRY(Configuracion::get_instance()->entry_directorio));
 
 	if (contenido_entry_direccion != "")
@@ -162,10 +166,16 @@ void AnyadirPermiso(GtkWidget *widget, gpointer lista)
 		gtk_tree_store_append(store, &iter, NULL);
 
 		if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(Configuracion::get_instance()->check_permiso_l)))
+		{
 			permiso_l = true;
+			Configuracion::get_instance()->permisos_lectura.push_back(contenido_entry_direccion);
+		}
 
 		if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(Configuracion::get_instance()->check_permiso_e)))
-				permiso_e = true;
+		{
+			permiso_e = true;
+			Configuracion::get_instance()->permisos_escritura.push_back(contenido_entry_direccion);
+		}
 
 		if (permiso_l && permiso_e)
 			gtk_tree_store_set(store, &iter, ITEM_RUTA, (Configuracion::get_instance()->directorio_seleccionado).c_str(), ITEM_L, icon_yes, ITEM_E, icon_yes, -1);
@@ -204,9 +214,8 @@ void ComprobarValidacion(GtkWidget *entry)
 void InsertarUsuario(GtkWidget *widget, GtkTreeView *lista_permisos)
 {
 	string usuario, password, sentencia;
-	bool existe, valido;
-	GtkTreeIter iter;
-	GtkTreeModel *modelo;
+	bool existe;
+	int id_usuario;
 
 	//Obtenemos de configuracion los valores que el usuario ha introducido en los campos
 	usuario = gtk_entry_get_text(GTK_ENTRY(Configuracion::get_instance()->entry_usuario_vnuevo));
@@ -220,23 +229,14 @@ void InsertarUsuario(GtkWidget *widget, GtkTreeView *lista_permisos)
 	{
 		sentencia = "INSERT INTO usuarios (usuario, password) VALUES ('" + usuario + "'" + ",'" + password + "')";
 		BD::EjecutarOperacion("NetTransfer.db", sentencia);
-		//Cerramos la ventana
+		//------------------------------------------PERMISOS--------------------------------------------------------------------
+		//Obenemos el id del usuario que acabamos de insertar
+		sentencia = "SELECT id FROM usuarios WHERE usuario LIKE '" + usuario + "'";
+		id_usuario = BD::ConsultaInt("NetTransfer.db", sentencia);
+		//----------------------------------------------------------------------------------------------------------------------
 	}
 	else
 		Mensaje mensaje("Error usuario ya existente", "El usuario ya existe en la base da datos", Configuracion::get_instance()->ventana_principal);
-
-	modelo = gtk_tree_view_get_model(GTK_TREE_VIEW(lista_permisos));
-	valido = gtk_tree_model_get_iter_first(modelo, &iter);
-
-	while (valido)
-	{
-		gchar *ruta;
-		gtk_tree_model_get(modelo, &iter, 0, &ruta, -1);
-		cout << ruta << endl;
-	    valido = gtk_tree_model_iter_next(GTK_TREE_MODEL(modelo), &iter);
-	    g_free(ruta);
-	}
-
 
 	gtk_widget_destroy(GTK_WIDGET(Configuracion::get_instance()->ventana_nuevo_usuario));
 }

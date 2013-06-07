@@ -13,7 +13,7 @@ public:
 
 	static bool ComprobarConsulta(string nombre_bd, string sentencia);
 	static bool EjecutarOperacion(string nombre_bd, string sentencia);
-
+	static int ConsultaInt(string nombre_bd, string sentencia);
 };
 
 #endif /* BD_H_ */

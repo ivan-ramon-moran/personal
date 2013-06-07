@@ -25,6 +25,8 @@
 								<option id="gnu.cpp.compiler.exe.debug.option.debugging.level.1141683372" name="Debug Level" superClass="gnu.cpp.compiler.exe.debug.option.debugging.level" value="gnu.cpp.compiler.debugging.level.max" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.other.other.68401459" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" value="-c -fmessage-length=0 -pthread" valueType="string"/>
 								<option id="gnu.cpp.compiler.option.include.paths.171119392" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="/usr/lib/x86_64-linux-gnu/glib-2.0/include"/>
+									<listOptionValue builtIn="false" value="/usr/include/libpng12"/>
 									<listOptionValue builtIn="false" value="/usr/include/gtk-3.0"/>
 									<listOptionValue builtIn="false" value="/usr/include/atk-1.0"/>
 									<listOptionValue builtIn="false" value="/usr/include/at-spi2-atk/2.0"/>
@@ -33,12 +35,9 @@
 									<listOptionValue builtIn="false" value="/usr/include/cairo"/>
 									<listOptionValue builtIn="false" value="/usr/include/gdk-pixbuf-2.0"/>
 									<listOptionValue builtIn="false" value="/usr/include/glib-2.0"/>
-									<listOptionValue builtIn="false" value="/usr/lib64/glib-2.0/include"/>
 									<listOptionValue builtIn="false" value="/usr/include/harfbuzz"/>
 									<listOptionValue builtIn="false" value="/usr/include/freetype2"/>
 									<listOptionValue builtIn="false" value="/usr/include/pixman-1"/>
-									<listOptionValue builtIn="false" value="/usr/include/libpng15"/>
-									<listOptionValue builtIn="false" value="/usr/include/libdrm"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.995800637" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
@@ -46,6 +45,8 @@
 								<option defaultValue="gnu.c.optimization.level.none" id="gnu.c.compiler.exe.debug.option.optimization.level.452618674" name="Optimization Level" superClass="gnu.c.compiler.exe.debug.option.optimization.level" valueType="enumerated"/>
 								<option id="gnu.c.compiler.exe.debug.option.debugging.level.27704968" name="Debug Level" superClass="gnu.c.compiler.exe.debug.option.debugging.level" value="gnu.c.debugging.level.max" valueType="enumerated"/>
 								<option id="gnu.c.compiler.option.include.paths.674509573" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="/usr/lib/x86_64-linux-gnu/glib-2.0/include"/>
+									<listOptionValue builtIn="false" value="/usr/include/libpng12"/>
 									<listOptionValue builtIn="false" value="/usr/include/gtk-3.0"/>
 									<listOptionValue builtIn="false" value="/usr/include/atk-1.0"/>
 									<listOptionValue builtIn="false" value="/usr/include/at-spi2-atk/2.0"/>
@@ -54,12 +55,9 @@
 									<listOptionValue builtIn="false" value="/usr/include/cairo"/>
 									<listOptionValue builtIn="false" value="/usr/include/gdk-pixbuf-2.0"/>
 									<listOptionValue builtIn="false" value="/usr/include/glib-2.0"/>
-									<listOptionValue builtIn="false" value="/usr/lib64/glib-2.0/include"/>
 									<listOptionValue builtIn="false" value="/usr/include/harfbuzz"/>
 									<listOptionValue builtIn="false" value="/usr/include/freetype2"/>
 									<listOptionValue builtIn="false" value="/usr/include/pixman-1"/>
-									<listOptionValue builtIn="false" value="/usr/include/libpng15"/>
-									<listOptionValue builtIn="false" value="/usr/include/libdrm"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1003570923" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 							</tool>
@@ -117,12 +115,11 @@
 						<entry flags="BUILTIN" kind="includePath" name="/usr/include/cairo"/>
 						<entry flags="BUILTIN" kind="includePath" name="/usr/include/gdk-pixbuf-2.0"/>
 						<entry flags="BUILTIN" kind="includePath" name="/usr/include/glib-2.0"/>
-						<entry flags="BUILTIN" kind="includePath" name="/usr/lib64/glib-2.0/include"/>
+						<entry flags="BUILTIN" kind="includePath" name="/usr/lib/x86_64-linux-gnu/glib-2.0/include"/>
 						<entry flags="BUILTIN" kind="includePath" name="/usr/include/harfbuzz"/>
 						<entry flags="BUILTIN" kind="includePath" name="/usr/include/freetype2"/>
 						<entry flags="BUILTIN" kind="includePath" name="/usr/include/pixman-1"/>
-						<entry flags="BUILTIN" kind="includePath" name="/usr/include/libpng15"/>
-						<entry flags="BUILTIN" kind="includePath" name="/usr/include/libdrm"/>
+						<entry flags="BUILTIN" kind="includePath" name="/usr/include/libpng12"/>
 					</externalSetting>
 					<externalSetting contentTypes="org.eclipse.cdt.managedbuilder.core.compiledObjectFile">
 						<entry flags="UNDEFINED" kind="libraryFile" name="gtk-3" srcPrefixMapping="" srcRootPath=""/>

@@ -45,3 +45,23 @@ bool BD::EjecutarOperacion(string nombre_bd, string sentencia)
 
 	return realizada;
 }
+
+int BD::ConsultaInt(string nombre_bd, string sentencia)
+{
+	int res = -1, res_ope;
+	sqlite3 *db;
+	sqlite3_stmt *resultado;
+	const char* siguiente;      /* puntero a la siguiente sentencia */
+
+	sqlite3_open(nombre_bd.c_str(), &db);
+	res_ope = sqlite3_prepare(db, sentencia.c_str(), sentencia.length(), &resultado, &siguiente);
+
+	if (sqlite3_step(resultado) == SQLITE_ROW)
+		res = sqlite3_column_int(resultado, 0);
+	else
+		cout << "ERROR" << endl;
+
+	sqlite3_close(db);
+
+	return res;
+}

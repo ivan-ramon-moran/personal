@@ -53,6 +53,8 @@ public:
 	/*Punteros que hacen referencia a los componentes gráficos del visor de achivos para mostrar
 	  los atributos de cada archivo/directorio*/
 	GtkWidget *label_nombre, *label_ruta, *label_tipo, *label_tamanyo;
+	//Vectores de permisos del usuario
+	vector<string> permisos_lectura, permisos_escritura;
 
 private:
 	static Configuracion *instance;
